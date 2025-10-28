@@ -58,11 +58,7 @@ import CSSrinivasRajuEpuri from './Assets/CSSrinivasRajuEpuri.png'
 
 function App() {
   const [showOtherBusiness, setShowOtherBusiness] = useState(false);
-<<<<<<< HEAD
   const [selectedBusiness, setSelectedBusiness] = useState(null);
-=======
-  const [selectedBusiness, setSelectedBusiness] = useState(null
->>>>>>> ea5af05385c64ab69120ea7d80bc12f4331f926e
   // eslint-disable-next-line no-unused-vars
   const [showOnlyOtherBusinesses, setShowOnlyOtherBusinesses] = useState(false);
 
