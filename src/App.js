@@ -59,6 +59,7 @@ import CSSrinivasRajuEpuri from './Assets/CSSrinivasRajuEpuri.png'
 function App() {
   const [showOtherBusiness, setShowOtherBusiness] = useState(false);
   const [selectedBusiness, setSelectedBusiness] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [showOnlyOtherBusinesses, setShowOnlyOtherBusinesses] = useState(false);
 
   const ITEMS_PER_PAGE = selectedBusiness ? 12 : 15;
