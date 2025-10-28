@@ -86,7 +86,6 @@ function App() {
   };
 
   const otherBusinessItems = [
-    // { src: santhosh, name: "Staffing and recruting", Keywords: ["HR Solutions", "Payroll Services", "Recruitment Solutions", "Manpower Services", "Human Resource Management"] },
     { src: Hemanth, name: "Hemanth Kumar Papani", company: "The Shooting Spot", Keywords: ["Photography Resort", "Pre-Wedding Studio", "Indoor & Outdoor Shooting", "Film Studio", "Premium Photography Services"] },
     { src: prakash, name: "AVS Prakash", company: "Digital Xcutives", Keywords: ["Digital Marketing", "SEO Services", "PPC Management", "Social Media Marketing", "Performance Marketing"] },
     { src: PremPrakashPugalia, name: "Prem Prakash Pugalia", company: "Bhagawati Enterprises", Keywords: ["Computer Hardware", "Printer Cartridges", "IT Solutions", "Networking", "POS Systems"] },
