@@ -1,0 +1,60 @@
+{
+  "status": "success",
+  "data": {
+    "vessel_info": {
+      "vessel_id": "0197ee74-b116-73d8-80e7-e44defde4ad5",
+      "vessel_name": "XIN XIA YANG",
+      "mmsi_identifier": "413188000",
+      "imo_identifier": "9416630",
+      "vessel_type": "Crude Oil Tanker",
+      "flag_country": "China"
+    },
+    "current_position": {
+      "location": {
+        "type": "Point",
+        "coordinates": [-0.26366201, -32.383244]
+      },
+      "sog": 11.6,
+      "cog": 283,
+      "heading": 281,
+      "last_updated": "2025-10-15T20:56:00.000Z",
+      "anchoring_status": "Under way using engine"
+    },
+    "active_trip": {
+      "departure_port": "BAYUQUAN",
+      "departure_port_unlocode": "CNBAY",
+      "destination_port": "ANGRA DOS REIS",
+      "destination_port_unlocode": "BRADR",
+      "actual_time_departure": "2025-09-15T01:32:00.000Z",
+      "estimated_time_arrival": "2025-10-24T19:00:00.000Z",
+      "trip_status": "En Route"
+    },
+    "trip_insights": {
+      "distance_covered_nm": 0,
+      "avg_speed_knots": 0,
+      "max_speed_knots": 0,
+      "trip_duration_hours": 0,
+      "fuel_efficiency": null,
+      "carbon_footprint": null
+    },
+    "current_route": null,
+    "waypoints": {
+      "total_waypoints": 0,
+      "waypoints_remaining": 0,
+      "waypoints_passed": 0,
+      "waypoint_details": []
+    },
+    "track_history": {
+      "points_count": 0,
+      "time_range": "Last 24 hours",
+      "first_point_time": null,
+      "last_point_time": null
+    }
+  },
+  "message": "Vessel active trip information retrieved successfully",
+  "metadata": {
+    "timestamp": "2025-10-21T05:41:23.425Z",
+    "requestId": "019a0549-4986-78a7-bb23-707fdfc0b484",
+    "durationMs": "3035 ms"
+  }
+}
