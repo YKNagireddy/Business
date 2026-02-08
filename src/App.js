@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import MetroLabs from './Assets/Metrolabs.png'
-import SRN from './Assets/SRN.png'
+// import SRN from './Assets/SRN.png'
 import Bhokta from './Assets/bhokta.png'
-import Osian from './Assets/osian.jpg'
+// import Osian from './Assets/osian.jpg'
 import Hemanth from './Assets/HemanthKumarPapani.png';
 import prakash from './Assets/Prakash.png'
 import PremPrakashPugalia from './Assets/PremPrakashPugalia.png'
