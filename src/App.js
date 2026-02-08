@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MetroLabs from './Assets/Metrolabs.png'
 import SRN from './Assets/SRN.png'
 import Bhokta from './Assets/bhokta.png'
@@ -55,35 +55,64 @@ import DrAmritaGandhi from './Assets/DrAmritaGandhi.png'
 import NawalKishoreChoudhary from './Assets/NawalKishoreChoudhary.png'
 import AbhijeetSharma from './Assets/AbhijeetSharma.png'
 import CSSrinivasRajuEpuri from './Assets/CSSrinivasRajuEpuri.png'
+import { getAllPersons } from './Api/index.js';
 
 function App() {
-  const [showOtherBusiness, setShowOtherBusiness] = useState(false);
+  // const [showOtherBusiness, setShowOtherBusiness] = useState(false);
   const [selectedBusiness, setSelectedBusiness] = useState(null);
   // eslint-disable-next-line no-unused-vars
-  const [showOnlyOtherBusinesses, setShowOnlyOtherBusinesses] = useState(false);
+  // const [showOnlyOtherBusinesses, setShowOnlyOtherBusinesses] = useState(false);
+const [activeTab, setActiveTab] = useState("home");
+const [showMobile, setShowMobile] = useState(false);
 
-  const ITEMS_PER_PAGE = selectedBusiness ? 12 : 15;
-  const [currentPage, setCurrentPage] = useState(1);
 
-  const toggleBusinessView = () => {
-    setShowOtherBusiness(!showOtherBusiness);
-    setSelectedBusiness(null);
-    setShowOnlyOtherBusinesses(false);
-  };
+  // const ITEMS_PER_PAGE = selectedBusiness ? 12 : 15;
+  // const [currentPage, setCurrentPage] = useState(1);
+const homeRef = React.useRef(null);
+const bniRef = React.useRef(null);
+const contactRef = React.useRef(null);
 
-  const showOtherBusinessesOnly = () => {
-    setShowOtherBusiness(true);
-    setSelectedBusiness(null);
-    setShowOnlyOtherBusinesses(true);
-  };
+const scrollToSection = (ref, tabName) => {
+  setActiveTab(tabName);
+  ref.current.scrollIntoView({ behavior: "smooth" });
+};
 
-  const buttonContent = showOtherBusiness ? 'My Business' : 'Other Business';
+
+  // const toggleBusinessView = () => {
+  //   setShowOtherBusiness(!showOtherBusiness);
+  //   setSelectedBusiness(null);
+  //   setShowOnlyOtherBusinesses(false);
+  // };
+
+  // const showOtherBusinessesOnly = () => {
+  //   setShowOtherBusiness(true);
+  //   setSelectedBusiness(null);
+  //   setShowOnlyOtherBusinesses(true);
+  // };
+
+  // const buttonContent = showOtherBusiness ? 'My Business' : 'Other Business';
 
   const userData = {
     name: "Santhosh Maryala",
     email: "maryalasanthosh.hr@gmail.com",
     phone: "8886089669",
   };
+
+  const getPersons = async () => {
+    try {
+      const res = await getAllPersons();
+      if (res?.data) {
+        console.log(res?.data)
+        // setMessages(res.data.messages);
+      }
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  };
+
+  useEffect(() => {
+    getPersons();
+  }, []);
 
   const otherBusinessItems = [
     { src: Hemanth, name: "Hemanth Kumar Papani", company: "The Shooting Spot", Keywords: ["Photography Resort", "Pre-Wedding Studio", "Indoor & Outdoor Shooting", "Film Studio", "Premium Photography Services"] },
@@ -136,144 +165,286 @@ function App() {
     { src: NawalKishoreChoudhary, name: "Nawal Kishore Choudhary", company: "Aboli Enterprises", Keywords: ["Flooring Solutions", "Epoxy Flooring", "Sports Flooring", "Concrete Flooring", "Commercial Flooring"] },
   ];
 
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedItems = otherBusinessItems
-    .filter((b) => !selectedBusiness || b.name !== selectedBusiness.name)
-    .slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  // const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  // const paginatedItems = otherBusinessItems
+  //   .filter((b) => !selectedBusiness || b.name !== selectedBusiness.name)
+  //   .slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  const totalPages = Math.ceil(
-    (selectedBusiness
-      ? otherBusinessItems.filter((b) => b.name !== selectedBusiness.name).length
-      : otherBusinessItems.length) / ITEMS_PER_PAGE
-  );
+  // const totalPages = Math.ceil(
+  //   (selectedBusiness
+  //     ? otherBusinessItems.filter((b) => b.name !== selectedBusiness.name).length
+  //     : otherBusinessItems.length) / ITEMS_PER_PAGE
+  // );
 
   const businessesData = [
     { name: "IT", logo: MetroLabs },
     { name: "CDM (Data Management)", logo: Bhokta },
-    { name: "Overseas Consultancy", logo: Osian },
-    { name: "Corrugated Boxes", logo: SRN },
+    // { name: "Overseas Consultancy", logo: Osian },
+    // { name: "Corrugated Boxes", logo: SRN },
   ];
 
   const BusinessButton = (
-    <>
-      <div className="flex gap-1">
+    <div className="flex flex-col items-center sm:items-start gap-2 sm:gap-3">
+      {/* === Buttons Row === */}
+      {/* <div className="flex flex-row flex-wrap justify-center sm:justify-start gap-2 sm:gap-3">
         <button
-          className="p-2 bg-blue-700 rounded-full text-white hover:bg-blue-800 transition"
+          className="px-3 py-1 sm:px-4 sm:py-2 bg-blue-700 rounded-full text-white text-xs sm:text-sm hover:bg-blue-800 transition"
           onClick={toggleBusinessView}
         >
           {buttonContent}
         </button>
         <button
-          className="p-2 bg-green-700 rounded-full text-white hover:bg-green-800 transition"
+          className="px-3 py-1 sm:px-4 sm:py-2 bg-green-700 rounded-full text-white text-xs sm:text-sm hover:bg-green-800 transition"
           onClick={showOtherBusinessesOnly}
         >
           Show Other Businesses
         </button>
-      </div>
-      {buttonContent === "Other Business" && (<p className='p-2 text-justify leading-snug text-left font-[callibri]'>Santhosh Maryala is a serial entrepreneur dedicated to innovation, job creation, and national growth. Armed with an MBA in HR and Finance from Osmania University and an MSc in Psychology from Kakatiya University, he blends business strategy with human insight. Guided by Dr. Narsin Vijaya, he founded Metrolabs Services Pvt Ltd in 2020—an integrated HR and IT solutions company offering end-to-end services in recruitment, payroll management, HR audits, accounting, POSH training, and software development using technologies like .NET, Java, Python, ServiceNow, and Full Stack. Later, he introduced training and placement programs to boost employability and internships. Despite pandemic challenges, he expanded globally, serving clients across the USA and Canada.</p>)}
-    </>
-  );
+      </div> */}
 
-  return (
-    <div className="p-2 bg-orange-500 min-h-screen">
-      {showOtherBusiness ? (
-        <div className="grid grid-cols-12 gap-2">
-          <div className="col-span-4 grid grid-rows-2 bg-gray-100 rounded-xl shadow-lg transition duration-300 p-1 bg-white rounded-lg">
-            {/* {!showOnlyOtherBusinesses && ( */}
-            <>
-              <UserInfo user={userData} />
-              <BusinessList businesses={businessesData} />
-            </>
-            {/* )} */}
-          </div>
-          <div className="col-span-8 bg-gray-100 rounded-xl shadow-lg transition duration-300 relative p-2">
-            {selectedBusiness ? (
-              <div className="grid grid-cols-2 gap-2">
-                <BusinessDetails business={selectedBusiness} />
-                <div className="p-4 rounded-lg bg-gray-50 overflow-y-auto h-full">
-                  <h3 className="text-lg font-semibold mb-2">Other Businesses</h3>
-                  <div className="grid grid-cols-3 gap-3">
-                    {paginatedItems.map((item, index) => (
-                      <div
-                        key={index}
-                        onClick={() => setSelectedBusiness(item)}
-                        className="cursor-pointer p-2 bg-white rounded-lg border hover:shadow-md flex flex-col items-center text-center transition mt-2"
-                      >
-                        <img
-                          src={item.src}
-                          alt={item.name}
-                          className="w-16 h-16 object-cover rounded-md border mb-2"
-                        />
-                        <p className="text-sm font-medium text-gray-700">{item.name}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex justify-center mt-2 space-x-1">
-                    <button
-                      disabled={currentPage === 1}
-                      onClick={() => setCurrentPage((p) => p - 1)}
-                      className="px-3 py-1 border rounded disabled:opacity-50"
-                    >
-                      Prev
-                    </button>
-                    <span className="text-sm text-gray-600">
-                      Page {currentPage} of {totalPages}
-                    </span>
-                    <button
-                      disabled={currentPage === totalPages}
-                      onClick={() => setCurrentPage((p) => p + 1)}
-                      className="px-3 py-1 border rounded disabled:opacity-50"
-                    >
-                      Next
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="p-4 rounded-lg bg-gray-50 overflow-y-auto">
-                <OtherBusinessImage
-                  otherBusinessItems={paginatedItems}
-                  setSelectedBusiness={setSelectedBusiness}
-                />
-                <div className="flex justify-center mt-2 space-x-1">
-                  <button
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage((p) => p - 1)}
-                    className="px-3 py-1 border rounded disabled:opacity-50"
-                  >
-                    Prev
-                  </button>
-                  <span className="text-sm text-gray-600">
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  <button
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage((p) => p + 1)}
-                    className="px-3 py-1 border rounded disabled:opacity-50"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            )}
-
-            <div className="absolute top-6 right-2 z-10">{BusinessButton}</div>
-          </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-3 gap-2 p-2 rounded-xl shadow-lg">
-          <div className="p-4 bg-white rounded-lg">
-            <UserInfo user={userData} />
-          </div>
-          <div className="p-4 bg-white rounded-lg">
-            <BusinessList businesses={businessesData} />
-          </div>
-          <div className="p-4 bg-white rounded-lg">
-            {BusinessButton}
-          </div>
-        </div>
-      )}
+      {/* === Text Below === */}
+      {/* {buttonContent === "Other Business" && ( */}
+        <p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-justify p-2 leading-snug">
+          Santhosh Maryala is a dynamic serial entrepreneur committed to driving innovation, employment generation, and national economic progress. With a strong academic foundation, he earned an MBA in HR and Finance from Osmania University and an MSc in Psychology from Kakatiya University. This unique combination of disciplines allows him to merge business strategy with a deep understanding of human behavior—an approach that shapes his leadership and business philosophy. Inspired by his mentor, Dr. Narsin Vijaya, Santhosh embarked on a journey to create ventures that contribute meaningfully to India’s GDP and empower individuals through sustainable employment opportunities.
+        </p>
+      {/* )} */}
     </div>
   );
+
+
+  return (
+    // <div className="p-2 bg-orange-500 min-h-screen overflow-x-hidden">
+    //   {showOtherBusiness ? (
+    //     <div className="grid grid-cols-1 md:grid-cols-12 gap-2">
+    //       {/* LEFT PANEL */}
+    //       <div className="md:col-span-4 flex flex-col bg-white rounded-xl shadow-lg p-2">
+    //         {!showOnlyOtherBusinesses && (
+    //           <>
+    //             <UserInfo user={userData} />
+    //             <BusinessList businesses={businessesData} />
+    //           </>
+    //         )}
+    //       </div>
+
+    //       {/* RIGHT PANEL */}
+    //       <div className="md:col-span-8 bg-white rounded-xl shadow-lg relative p-2">
+    //         {selectedBusiness ? (
+    //           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+    //             <BusinessDetails business={selectedBusiness} />
+
+    //             <div className="p-3 rounded-lg bg-gray-50 overflow-y-auto h-full">
+    //               <h3 className="text-base sm:text-lg font-semibold mb-2">
+    //                 Other Businesses
+    //               </h3>
+    //               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+    //                 {paginatedItems.map((item, index) => (
+    //                   <div
+    //                     key={index}
+    //                     onClick={() => setSelectedBusiness(item)}
+    //                     className="cursor-pointer p-2 bg-white rounded-lg border hover:shadow-md flex flex-col items-center text-center transition"
+    //                   >
+    //                     <img
+    //                       src={item.src}
+    //                       alt={item.name}
+    //                       className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-md border mb-2"
+    //                     />
+    //                     <p className="text-xs sm:text-sm font-medium text-gray-700 truncate w-full">
+    //                       {item.name}
+    //                     </p>
+    //                   </div>
+    //                 ))}
+    //               </div>
+
+    //               {/* Pagination */}
+    //               <div className="flex justify-center mt-3 space-x-2 text-xs sm:text-sm">
+    //                 <button
+    //                   disabled={currentPage === 1}
+    //                   onClick={() => setCurrentPage((p) => p - 1)}
+    //                   className="px-2 py-1 border rounded disabled:opacity-50"
+    //                 >
+    //                   Prev
+    //                 </button>
+    //                 <span className="text-gray-600">
+    //                   Page {currentPage} of {totalPages}
+    //                 </span>
+    //                 <button
+    //                   disabled={currentPage === totalPages}
+    //                   onClick={() => setCurrentPage((p) => p + 1)}
+    //                   className="px-2 py-1 border rounded disabled:opacity-50"
+    //                 >
+    //                   Next
+    //                 </button>
+    //               </div>
+    //             </div>
+    //           </div>
+    //         ) : (
+    //           <div className="p-2 sm:p-3 rounded-lg bg-gray-50 overflow-y-auto">
+    //             <OtherBusinessImage
+    //               otherBusinessItems={paginatedItems}
+    //               setSelectedBusiness={setSelectedBusiness}
+    //             />
+
+    //             {/* Pagination */}
+    //             <div className="flex justify-center mt-3 space-x-2 text-xs sm:text-sm">
+    //               <button
+    //                 disabled={currentPage === 1}
+    //                 onClick={() => setCurrentPage((p) => p - 1)}
+    //                 className="px-2 py-1 border rounded disabled:opacity-50"
+    //               >
+    //                 Prev
+    //               </button>
+    //               <span className="text-gray-600">
+    //                 Page {currentPage} of {totalPages}
+    //               </span>
+    //               <button
+    //                 disabled={currentPage === totalPages}
+    //                 onClick={() => setCurrentPage((p) => p + 1)}
+    //                 className="px-2 py-1 border rounded disabled:opacity-50"
+    //               >
+    //                 Next
+    //               </button>
+    //             </div>
+    //           </div>
+    //         )}
+
+    //         <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10">
+    //           {BusinessButton}
+    //         </div>
+    //       </div>
+    //     </div>
+    //   ) : (
+    //     // Default view (My Business)
+    //     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 p-2 rounded-xl">
+    //       <div className="p-3 bg-white rounded-lg">
+    //         <UserInfo user={userData} />
+    //       </div>
+    //       <div className="p-3 bg-white rounded-lg">
+    //         <BusinessList businesses={businessesData} />
+    //       </div>
+    //       <div className="p-3 bg-white rounded-lg">{BusinessButton}</div>
+    //     </div>
+    //   )}
+    // </div>
+// return (
+  <div className="p-4 bg-purple-300 min-h-screen overflow-x-hidden">
+
+    {/* NAVBAR */}
+   <div className="bg-white rounded-xl shadow-md p-3 mb-4 flex flex-wrap justify-end gap-3 sticky top-0 z-50">
+
+  <button
+    onClick={() => scrollToSection(homeRef, "home")}
+    className={`px-4 py-2 rounded-full font-semibold ${
+      activeTab === "home"
+        ? "bg-purple-500 text-white"
+        : "bg-gray-200 text-gray-700 hover:bg-purple-300 hover:text-white"
+    }`}
+  >
+    Home
+  </button>
+
+  <button
+    onClick={() => scrollToSection(bniRef, "bni")}
+    className={`px-4 py-2 rounded-full font-semibold ${
+      activeTab === "bni"
+        ? "bg-purple-500 text-white"
+        : "bg-gray-200 text-gray-700 hover:bg-purple-300 hover:text-white"
+    }`}
+  >
+    BNI
+  </button>
+
+  <button
+    onClick={() => scrollToSection(contactRef, "contact")}
+    className={`px-4 py-2 rounded-full font-semibold ${
+      activeTab === "contact"
+        ? "bg-purple-500 text-white"
+        : "bg-gray-200 text-gray-700 hover:bg-purple-300 hover:text-white"
+    }`}
+  >
+    Contact Us
+  </button>
+
+</div>
+
+
+    {/* HOME SECTION */}
+    <div ref={homeRef} className="bg-white rounded-xl shadow-lg p-2 mb-6">
+      {/* <h2 className="text-xl font-bold mb-4 text-center">Home</h2> */}
+
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+        <div className="md:col-span-6">
+          <UserInfo user={userData} />
+        </div>
+
+        <div className="md:col-span-6">
+          <BusinessList businesses={businessesData} />
+        </div>
+
+        
+      </div>
+{/* <div className="md:col-span-12"> */}
+          {BusinessButton}
+        {/* </div> */}
+    </div>
+
+    {/* BNI SECTION */}
+    <div ref={bniRef} className="bg-white rounded-xl shadow-lg p-4 mb-6">
+        <h2 className="text-xl font-bold mb-4 text-center">
+          BNI Business List
+        </h2>
+
+        {/* ⭐ Clicking any business will open BusinessDetails */}
+        {selectedBusiness ? (
+          <div className="bg-gray-50 p-4 rounded-xl relative">
+            <button
+              onClick={() => setSelectedBusiness(null)}
+              className="absolute top-2 right-2 px-3 py-1 bg-purple-500 text-white rounded-full text-xs"
+            >
+              Back
+            </button>
+
+            <BusinessDetails business={selectedBusiness} />
+          </div>
+        ) : (
+          <OtherBusinessImage
+            otherBusinessItems={otherBusinessItems}
+            setSelectedBusiness={setSelectedBusiness}
+          />
+        )}
+      </div>
+
+
+    {/* CONTACT SECTION */}
+    <div ref={contactRef} className="bg-white rounded-xl shadow-lg p-6 mb-6 max-w-2xl mx-auto">
+      <h2 className="text-2xl font-bold mb-4 text-center">Contact Us</h2>
+
+      <form className="space-y-4">
+        <input className="w-full border p-2 rounded-lg" placeholder="Name" />
+        <input className="w-full border p-2 rounded-lg" placeholder="Email" />
+        <textarea rows="4" className="w-full border p-2 rounded-lg" placeholder="Message"></textarea>
+
+        <button className="w-full bg-purple-300 text-white py-2 rounded-lg font-semibold hover:bg-purple-400">
+          Submit
+        </button>
+      </form>
+    </div>
+{/* Floating Click Me Button */}
+{/* Floating Click Me Button */}
+<div className="fixed bottom-5 right-5 z-[999]">
+  <button
+    onClick={() => setShowMobile(!showMobile)}
+    className={`px-5 py-3 rounded-full font-bold shadow-lg transition duration-300 
+      ${showMobile 
+        ? "bg-white text-purple-600 border border-purple-400" 
+        : "bg-purple-500 text-white animate-bounce hover:bg-purple-600"
+      }`}
+  >
+    {showMobile ? "📞 8886089669" : "Click Me"}
+  </button>
+</div>
+  </div>
+// );
+
+  );
 }
+
 export default App;
