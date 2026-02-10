@@ -471,12 +471,12 @@ const [bniSearchTerm, setBniSearchTerm] = useState("");
   <div className="flex flex-col items-center justify-center gap-6 order-2">
 
     <div className="text-center">
-      <img src={MetroLabs} className="h-13 object-contain mx-auto" />
+      <img src={MetroLabs} alt="Metro Labs" className="h-13 object-contain mx-auto" />
       <p className="mt-2 text-sm text-gray-700">IT</p>
     </div>
 
     <div className="text-center">
-      <img src={Bhokta} className="h-13 object-contain mx-auto" />
+      <img src={Bhokta} alt="Bhokta" className="h-13 object-contain mx-auto" />
       <p className="mt-2 text-sm text-gray-700">
         CDM (Data Management)
       </p>
