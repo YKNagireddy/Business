@@ -1,8 +1,9 @@
 const BusinessList = ({ businesses, onBusinessClick }) => (
+<div>
+
+
     <div className="p-3 sm:p-4 md:p-6 text-[6px] sm:text-[8px] md:text-[10px] lg:text-xs xl:text-sm 2xl:text-base">
-        <h1 className="mb-4 text-center font-semibold text-gray-800 text-[8px] sm:text-[10px] md:text-sm lg:text-base xl:text-lg 2xl:text-xl">
-            My Business
-        </h1>
+
 
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
             {businesses.map((item, index) => (
@@ -24,6 +25,7 @@ const BusinessList = ({ businesses, onBusinessClick }) => (
             ))}
         </div>
     </div>
+</div>
 );
 
 export default BusinessList;

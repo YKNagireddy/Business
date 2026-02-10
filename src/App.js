@@ -55,7 +55,9 @@ import DrAmritaGandhi from './Assets/DrAmritaGandhi.png'
 import NawalKishoreChoudhary from './Assets/NawalKishoreChoudhary.png'
 import AbhijeetSharma from './Assets/AbhijeetSharma.png'
 import CSSrinivasRajuEpuri from './Assets/CSSrinivasRajuEpuri.png'
+import Santhosh1 from './Assets/santhosh1.jpeg'
 import { getAllPersons } from './Api/index.js';
+
 
 function App() {
   // const [showOtherBusiness, setShowOtherBusiness] = useState(false);
@@ -64,17 +66,20 @@ function App() {
   // const [showOnlyOtherBusinesses, setShowOnlyOtherBusinesses] = useState(false);
 const [activeTab, setActiveTab] = useState("home");
 const [showMobile, setShowMobile] = useState(false);
+const [bniSearchTerm, setBniSearchTerm] = useState("");
+const [menuOpen, setMenuOpen] = useState(false);
+
 
 
   // const ITEMS_PER_PAGE = selectedBusiness ? 12 : 15;
   // const [currentPage, setCurrentPage] = useState(1);
-const homeRef = React.useRef(null);
-const bniRef = React.useRef(null);
-const contactRef = React.useRef(null);
-
-const scrollToSection = (ref, tabName) => {
+const scrollToSection = (sectionId, tabName) => {
   setActiveTab(tabName);
-  ref.current.scrollIntoView({ behavior: "smooth" });
+  const element = document.getElementById(sectionId);
+  if (element) {
+    const offset = element.offsetTop - 80; // Subtract navbar height + extra space
+    window.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+  }
 };
 
 
@@ -183,6 +188,7 @@ const scrollToSection = (ref, tabName) => {
     // { name: "Corrugated Boxes", logo: SRN },
   ];
 
+  // eslint-disable-next-line no-unused-vars
   const BusinessButton = (
     <div className="flex flex-col items-center sm:items-start gap-2 sm:gap-3">
       {/* === Buttons Row === */}
@@ -325,123 +331,303 @@ const scrollToSection = (ref, tabName) => {
     //   )}
     // </div>
 // return (
-  <div className="p-4 bg-purple-300 min-h-screen overflow-x-hidden">
+<div className=" bg-white min-h-screen overflow-x-hidden pt-4">
+{/* NAVBAR */}
+{/*<div className="fixed top-0 left-0 right-0 z-50 w-full bg-white border-b">
 
-    {/* NAVBAR */}
-   <div className="bg-white rounded-xl shadow-md p-3 mb-4 flex flex-wrap justify-end gap-3 sticky top-0 z-50">
+  <div className="relative flex items-center h-16 px-6 max-w-7xl mx-auto">
 
-  <button
-    onClick={() => scrollToSection(homeRef, "home")}
-    className={`px-4 py-2 rounded-full font-semibold ${
-      activeTab === "home"
-        ? "bg-purple-500 text-white"
-        : "bg-gray-200 text-gray-700 hover:bg-purple-300 hover:text-white"
+    
+    <h1 className="absolute left-1/2 -translate-x-1/2 font-bold text-lg">
+      My Business
+    </h1>
+
+    
+    <div className="hidden md:flex gap-3 ml-auto">
+
+      <button
+        onClick={() => scrollToSection("home", "home")}
+        className={`px-4 py-2 rounded-full font-semibold transition ${
+          activeTab === "home"
+            ? "bg-purple-500 text-white"
+            : "bg-gray-200 text-gray-700 hover:bg-purple-300 hover:text-white"
+        }`}
+      >
+        Home
+      </button>
+
+      <button
+        onClick={() => scrollToSection("bni", "bni")}
+        className={`px-4 py-2 rounded-full font-semibold transition ${
+          activeTab === "bni"
+            ? "bg-purple-500 text-white"
+            : "bg-gray-200 text-gray-700 hover:bg-purple-300 hover:text-white"
+        }`}
+      >
+        BNI
+      </button>
+
+      <button
+        onClick={() => scrollToSection("contact", "contact")}
+        className={`px-4 py-2 rounded-full font-semibold transition ${
+          activeTab === "contact"
+            ? "bg-purple-500 text-white"
+            : "bg-gray-200 text-gray-700 hover:bg-purple-300 hover:text-white"
+        }`}
+      >
+        Contact Us
+      </button>
+
+    </div>
+
+    
+    <button
+      className="md:hidden ml-auto text-2xl"
+      onClick={() => setMenuOpen(!menuOpen)}
+    >
+      ☰
+    </button>
+  </div>
+
+  
+  <div
+    className={`md:hidden overflow-hidden transition-all duration-300 ${
+      menuOpen ? "max-h-60 py-4" : "max-h-0"
     }`}
   >
-    Home
-  </button>
+    <div className="flex flex-col gap-3 px-6">
 
-  <button
-    onClick={() => scrollToSection(bniRef, "bni")}
-    className={`px-4 py-2 rounded-full font-semibold ${
-      activeTab === "bni"
-        ? "bg-purple-500 text-white"
-        : "bg-gray-200 text-gray-700 hover:bg-purple-300 hover:text-white"
-    }`}
-  >
-    BNI
-  </button>
+      <button
+        onClick={() => {
+          scrollToSection("home", "home");
+          setMenuOpen(false);
+        }}
+        className="bg-gray-200 px-4 py-2 rounded-full"
+      >
+        Home
+      </button>
 
-  <button
-    onClick={() => scrollToSection(contactRef, "contact")}
-    className={`px-4 py-2 rounded-full font-semibold ${
-      activeTab === "contact"
-        ? "bg-purple-500 text-white"
-        : "bg-gray-200 text-gray-700 hover:bg-purple-300 hover:text-white"
-    }`}
-  >
-    Contact Us
-  </button>
+      <button
+        onClick={() => {
+          scrollToSection("bni", "bni");
+          setMenuOpen(false);
+        }}
+        className="bg-gray-200 px-4 py-2 rounded-full"
+      >
+        BNI
+      </button>
 
+      <button
+        onClick={() => {
+          scrollToSection("contact", "contact");
+          setMenuOpen(false);
+        }}
+        className="bg-gray-200 px-4 py-2 rounded-full"
+      >
+        Contact Us
+      </button>
+
+    </div>
+  </div>
+</div>
+*/}
+
+
+   {/* HOME SECTION */}
+<div id="home" className="bg-white min-h-screen ">
+
+  <div className="flex justify-center items-center py-9">
+    <h1 className="font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-center drop-shadow-lg leading-tight">
+      Business Portfolio & Network
+    </h1>
+
+  </div>
+
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-10 px-10 max-w-7xl mx-auto">
+
+    {/* LEFT — FULL IMAGE */}
+    <div className="flex justify-center">
+      <img
+        src={Santhosh1}  
+        alt="Santhosh"
+        className="w-full max-w-md rounded-2xl shadow-lg object-cover"
+      />
+    </div>
+
+    {/* RIGHT — EQUAL 50/50 TEXT + LOGOS */}
+<div className="flex flex-col space-y-6">
+
+  {/* TOP ROW */}
+<div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6 items-center">
+
+  {/* DETAILS */}
+  <div className="flex flex-col justify-center text-gray-700 text-xl space-y-3 order-1">
+    <p><strong>Name:</strong> Santhosh Maryala</p>
+    <p><strong>Mail Id:</strong> maryalasanthosh.hr@gmail.com</p>
+    <p><strong>Phone Number:</strong> 8886089669</p>
+  </div>
+
+  {/* LOGOS */}
+  <div className="flex flex-col items-center justify-center gap-6 order-2">
+
+    <div className="text-center">
+      <img src={MetroLabs} className="h-13 object-contain mx-auto" />
+      <p className="mt-2 text-sm text-gray-700">IT</p>
+    </div>
+
+    <div className="text-center">
+      <img src={Bhokta} className="h-13 object-contain mx-auto" />
+      <p className="mt-2 text-sm text-gray-700">
+        CDM (Data Management)
+      </p>
+    </div>
+
+  </div>
 </div>
 
 
-    {/* HOME SECTION */}
-    <div ref={homeRef} className="bg-white rounded-xl shadow-lg p-2 mb-6">
-      {/* <h2 className="text-xl font-bold mb-4 text-center">Home</h2> */}
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-        <div className="md:col-span-6">
-          <UserInfo user={userData} />
-        </div>
+  {/* PARAGRAPH */}
+    <p className="text-gray-700 text-base leading-relaxed text-justify " >
+      Santhosh Maryala is a dynamic serial entrepreneur committed to driving innovation,
+      employment generation, and national economic progress. With a strong academic
+      foundation, he earned an MBA in HR and Finance from Osmania University and an MSc
+      in Psychology from Kakatiya University. This unique combination of disciplines
+      allows him to merge business strategy with a deep understanding of human behavior—
+      an approach that shapes his leadership and business philosophy.
+    </p>
 
-        <div className="md:col-span-6">
-          <BusinessList businesses={businessesData} />
-        </div>
 
-        
+
+</div>
+
+</div>
+</div>
+
+{/* BNI SECTION */}
+<div
+  id="bni"
+  className="  max-w-7xl mx-auto flex flex-col h-[85vh]"
+>
+
+  {/* TITLE ROW */}
+  <div className="mb-6 text-center">
+    <h1 className="font-extrabold text-4xl md:text-5xl drop-shadow-lg">
+      BNI Business List
+    </h1>
+  </div>
+
+  {/* SEARCH ROW */}
+<div className="mb-6 flex justify-end">
+  <input
+    type="text"
+    placeholder="Search by keyword, name, or company..."
+    value={bniSearchTerm}
+    onChange={(e) => setBniSearchTerm(e.target.value)}
+    className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-96 focus:outline-none focus:ring-2 focus:ring-purple-400"
+  />
+</div>
+
+
+  {/* SCROLLABLE GRID AREA */}
+  <div className="flex-1 overflow-y-auto pr-2 hide-scrollbar">
+
+    {selectedBusiness ? (
+      <div className="bg-gray-50 p-4 rounded-xl">
+        <BusinessDetails
+          business={selectedBusiness}
+          onBack={() => setSelectedBusiness(null)}
+        />
       </div>
-{/* <div className="md:col-span-12"> */}
-          {BusinessButton}
-        {/* </div> */}
-    </div>
+    ) : (
 
-    {/* BNI SECTION */}
-    <div ref={bniRef} className="bg-white rounded-xl shadow-lg p-4 mb-6">
-        <h2 className="text-xl font-bold mb-4 text-center">
-          BNI Business List
-        </h2>
+      <OtherBusinessImage
+        otherBusinessItems={otherBusinessItems}
+        setSelectedBusiness={setSelectedBusiness}
+        searchTerm={bniSearchTerm}
+      />
+    )}
 
-        {/* ⭐ Clicking any business will open BusinessDetails */}
-        {selectedBusiness ? (
-          <div className="bg-gray-50 p-4 rounded-xl relative">
-            <button
-              onClick={() => setSelectedBusiness(null)}
-              className="absolute top-2 right-2 px-3 py-1 bg-purple-500 text-white rounded-full text-xs"
-            >
-              Back
-            </button>
-
-            <BusinessDetails business={selectedBusiness} />
-          </div>
-        ) : (
-          <OtherBusinessImage
-            otherBusinessItems={otherBusinessItems}
-            setSelectedBusiness={setSelectedBusiness}
-          />
-        )}
-      </div>
+  </div>
+</div>
 
 
     {/* CONTACT SECTION */}
-    <div ref={contactRef} className="bg-white rounded-xl shadow-lg p-6 mb-6 max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4 text-center">Contact Us</h2>
+<div id="contact" className="py-16 px-6 max-w-5xl mx-auto">
 
-      <form className="space-y-4">
-        <input className="w-full border p-2 rounded-lg" placeholder="Name" />
-        <input className="w-full border p-2 rounded-lg" placeholder="Email" />
-        <textarea rows="4" className="w-full border p-2 rounded-lg" placeholder="Message"></textarea>
+  <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-12">
+    Contact Us
+  </h2>
 
-        <button className="w-full bg-purple-300 text-white py-2 rounded-lg font-semibold hover:bg-purple-400">
-          Submit
-        </button>
-      </form>
+  <form className="space-y-8">
+
+    {/* ROW 1 */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <div>
+        <label className="block text-sm font-semibold text-gray-600 mb-2">
+          Full Name
+        </label>
+        <input
+          type="text"
+          placeholder="Enter your name"
+          className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-semibold text-gray-600 mb-2">
+          Email Address
+        </label>
+        <input
+          type="email"
+          placeholder="Enter your email"
+          className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+        />
+      </div>
+
     </div>
-{/* Floating Click Me Button */}
-{/* Floating Click Me Button */}
-<div className="fixed bottom-5 right-5 z-[999]">
-  <button
-    onClick={() => setShowMobile(!showMobile)}
-    className={`px-5 py-3 rounded-full font-bold shadow-lg transition duration-300 
-      ${showMobile 
-        ? "bg-white text-purple-600 border border-purple-400" 
-        : "bg-purple-500 text-white animate-bounce hover:bg-purple-600"
-      }`}
-  >
-    {showMobile ? "📞 8886089669" : "Click Me"}
-  </button>
+
+    {/* MESSAGE */}
+    <div>
+      <label className="block text-sm font-semibold text-gray-600 mb-2">
+        Message
+      </label>
+      <textarea
+        rows="6"
+        placeholder="Write your message..."
+        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+      />
+    </div>
+
+    {/* BUTTON */}
+    <div className="text-center">
+      <button
+        type="submit"
+        className="bg-purple-600 text-white px-10 py-3 rounded-lg font-semibold text-lg hover:bg-purple-700 transition shadow-md"
+      >
+        Send Message
+      </button>
+    </div>
+
+  </form>
 </div>
+
+    {/* Floating Click Me Button */}
+  {/* Floating Click Me Button */}
+  <div className="fixed bottom-5 right-5 z-[999]">
+    <button
+      onClick={() => setShowMobile(!showMobile)}
+      className={`px-5 py-3 rounded-full font-bold shadow-lg transition duration-300 
+        ${showMobile 
+          ? "bg-white text-purple-600 border border-purple-400" 
+          : "bg-purple-500 text-white animate-bounce hover:bg-purple-600"
+        }`}
+    >
+      {showMobile ? "📞 8886089669" : "Click Me"}
+    </button>
   </div>
+</div>
 // );
 
   );
