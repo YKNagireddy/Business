@@ -9,8 +9,8 @@ import PremPrakashPugalia from './Assets/PremPrakashPugalia.png'
 import MSumanKumar from './Assets/Dr.MSumanKumar.png'
 import PraneethMurarishetty from './Assets/PraneethMurarishetty.png'
 import OtherBusinessImage from './OtherBusinessImage';
-import UserInfo from './UsersInfo'
-import BusinessList from './BusinessList';
+// import UserInfo from './UsersInfo'
+// import BusinessList from './BusinessList';
 import BusinessDetails from './BusinessDetails'
 import AmbrishSharma from './Assets/AmbrishSharma.png'
 import SrivaniNerella from './Assets/Ar.SrivaniNerella.png'
@@ -64,23 +64,23 @@ function App() {
   const [selectedBusiness, setSelectedBusiness] = useState(null);
   // eslint-disable-next-line no-unused-vars
   // const [showOnlyOtherBusinesses, setShowOnlyOtherBusinesses] = useState(false);
-const [activeTab, setActiveTab] = useState("home");
+// const [activeTab, setActiveTab] = useState("home");
 const [showMobile, setShowMobile] = useState(false);
 const [bniSearchTerm, setBniSearchTerm] = useState("");
-const [menuOpen, setMenuOpen] = useState(false);
+// const [menuOpen, setMenuOpen] = useState(false);
 
 
 
   // const ITEMS_PER_PAGE = selectedBusiness ? 12 : 15;
   // const [currentPage, setCurrentPage] = useState(1);
-const scrollToSection = (sectionId, tabName) => {
-  setActiveTab(tabName);
-  const element = document.getElementById(sectionId);
-  if (element) {
-    const offset = element.offsetTop - 80; // Subtract navbar height + extra space
-    window.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
-  }
-};
+// const scrollToSection = (sectionId, tabName) => {
+//   setActiveTab(tabName);
+//   const element = document.getElementById(sectionId);
+//   if (element) {
+//     const offset = element.offsetTop - 80; // Subtract navbar height + extra space
+//     window.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+//   }
+// };
 
 
   // const toggleBusinessView = () => {
@@ -97,11 +97,11 @@ const scrollToSection = (sectionId, tabName) => {
 
   // const buttonContent = showOtherBusiness ? 'My Business' : 'Other Business';
 
-  const userData = {
-    name: "Santhosh Maryala",
-    email: "maryalasanthosh.hr@gmail.com",
-    phone: "8886089669",
-  };
+  // const userData = {
+  //   name: "Santhosh Maryala",
+  //   email: "maryalasanthosh.hr@gmail.com",
+  //   phone: "8886089669",
+  // };
 
   const getPersons = async () => {
     try {
@@ -181,12 +181,12 @@ const scrollToSection = (sectionId, tabName) => {
   //     : otherBusinessItems.length) / ITEMS_PER_PAGE
   // );
 
-  const businessesData = [
-    { name: "IT", logo: MetroLabs },
-    { name: "CDM (Data Management)", logo: Bhokta },
-    // { name: "Overseas Consultancy", logo: Osian },
-    // { name: "Corrugated Boxes", logo: SRN },
-  ];
+  // const businessesData = [
+  //   { name: "IT", logo: MetroLabs },
+  //   { name: "CDM (Data Management)", logo: Bhokta },
+  //   // { name: "Overseas Consultancy", logo: Osian },
+  //   // { name: "Corrugated Boxes", logo: SRN },
+  // ];
 
   // eslint-disable-next-line no-unused-vars
   const BusinessButton = (
