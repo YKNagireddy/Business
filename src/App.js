@@ -438,7 +438,7 @@ const [bniSearchTerm, setBniSearchTerm] = useState("");
 
   <div className="flex justify-center items-center py-9">
     <h1 className="font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-center drop-shadow-lg leading-tight">
-      Business Portfolio & Network
+      Business Portfolio
     </h1>
 
   </div>
@@ -461,25 +461,42 @@ const [bniSearchTerm, setBniSearchTerm] = useState("");
 <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6 items-center">
 
   {/* DETAILS */}
-  <div className="flex flex-col justify-center text-gray-700 text-xl space-y-3 order-1">
+  <div className="flex flex-col text-gray-800 text-lg space-y-3">
+
     <p><strong>Name:</strong> Santhosh Maryala</p>
-    <p><strong>Mail Id:</strong> maryalasanthosh.hr@gmail.com</p>
-    <p><strong>Phone Number:</strong> 8886089669</p>
+
+{/* Mail + Phone centered */}
+<div className="flex flex-col text-sm md:text-lg text-gray-800 space-y-2">
+
+  <div className="flex items-center gap-3 w-full max-w-xl">
+    <i className="bi bi-envelope-fill text-blue-600 text-lg"></i>
+    <span className="break-all">
+      maryalasanthosh.hr@gmail.com
+    </span>
   </div>
+
+  <div className="flex items-center gap-3 w-full max-w-xl">
+    <i className="bi bi-telephone-fill text-green-600 text-lg"></i>
+    <span>
+      +91 7036089669 - +91 8886089669
+    </span>
+  </div>
+</ div>
+</ div>
 
   {/* LOGOS */}
   <div className="flex flex-col items-center justify-center gap-6 order-2">
 
     <div className="text-center">
       <img src={MetroLabs} alt="Metro Labs" className="h-13 object-contain mx-auto" />
-      <p className="mt-2 text-sm text-gray-700">IT</p>
+      {/* <p className="mt-2 text-sm text-gray-700">IT</p> */}
     </div>
 
     <div className="text-center">
       <img src={Bhokta} alt="Bhokta" className="h-13 object-contain mx-auto" />
-      <p className="mt-2 text-sm text-gray-700">
+      {/* <p className="mt-2 text-sm text-gray-700">
         CDM (Data Management)
-      </p>
+      </p> */}
     </div>
 
   </div>
@@ -513,7 +530,7 @@ const [bniSearchTerm, setBniSearchTerm] = useState("");
   {/* TITLE ROW */}
   <div className="mb-6 text-center">
     <h1 className="font-extrabold text-4xl md:text-5xl drop-shadow-lg">
-      BNI Business List
+      My Business List
     </h1>
   </div>
 
