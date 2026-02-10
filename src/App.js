@@ -475,12 +475,26 @@ const [bniSearchTerm, setBniSearchTerm] = useState("");
     </span>
   </div>
 
-  <div className="flex items-center gap-3 w-full max-w-xl">
-    <i className="bi bi-telephone-fill text-green-600 text-lg"></i>
-    <span>
-      +91 7036089669 - +91 8886089669
-    </span>
-  </div>
+<div className="flex items-center gap-3 w-full max-w-xl">
+  <i className="bi bi-telephone-fill text-green-600 text-lg"></i>
+
+  <a
+    href="tel:+917036089669"
+    className="text-gray-800"
+  >
+    +91 7036089669
+  </a>
+
+  <span>-</span>
+
+  <a
+    href="tel:+918886089669"
+    className="text-gray-800"
+  >
+    +91 8886089669
+  </a>
+</div>
+
 </ div>
 </ div>
 
