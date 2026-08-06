@@ -1,0 +1,71 @@
+/* ============================================================
+   DESIGN TOKENS — Business Portfolio
+   Palette: ink navy / cool paper / brass gold / deep teal
+   Type: Fraunces (display) + Manrope (body) + IBM Plex Mono (data)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --color-ink: #0E1B2E;
+  --color-ink-soft: #16263D;
+  --color-ink-line: rgba(255, 255, 255, 0.12);
+
+  --color-paper: #EEF1F5;
+  --color-paper-line: #D7DBE2;
+
+  --color-white: #FFFFFF;
+
+  --color-gold: #C8973B;
+  --color-gold-soft: #E3C081;
+  --color-gold-dim: rgba(200, 151, 59, 0.16);
+
+  --color-teal: #1F5C57;
+  --color-teal-soft: #2F786F;
+  --color-teal-dim: rgba(31, 92, 87, 0.14);
+
+  --color-slate: #3A4250;
+  --color-slate-soft: #6B7280;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Manrope', -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+}
+
+/* Hide scrollbars but keep scroll (used in Business Members grid) */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Smooth scroll for in-page nav */
+html { scroll-behavior: smooth; }
+
+/* ---------- Constellation signature motif ---------- */
+/* Ambient drifting nodes for the hero background */
+@keyframes drift {
+  0%   { transform: translate(0, 0); }
+  50%  { transform: translate(8px, -10px); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes pulse-node {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.9; }
+}
+.constellation-node {
+  animation: drift 9s ease-in-out infinite, pulse-node 4s ease-in-out infinite;
+}
+.constellation-line {
+  stroke-dasharray: 4 6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .constellation-node { animation: none !important; }
+  html { scroll-behavior: auto; }
+}
+
+/* Eyebrow label style used across sections */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
