@@ -1,24 +1,16 @@
-/** @type {import('tailwindcss').Config} */
+/**
+ * Merge this into your existing tailwind.config.js theme.extend
+ * (do not replace your whole config — just add these keys)
+ */
 module.exports = {
-  content: ["./src/**/*.{html,js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      filter: {
-        'custom-blue': 'invert(31%) sepia(27%) saturate(1156%) hue-rotate(207deg) brightness(93%) contrast(90%)',
-      },
-      screens: {
-        '3xl': '1920px',
-        '4xl': '2560px',
-      },
       colors: {
         ink: {
           DEFAULT: '#0E1B2E',
           soft: '#16263D',
         },
-        paper: {
-          DEFAULT: '#EEF1F5',
-          line: '#D7DBE2',
-        },
+        paper: '#EEF1F5',
         gold: {
           DEFAULT: '#C8973B',
           soft: '#E3C081',
@@ -39,5 +31,4 @@ module.exports = {
       },
     },
   },
-  plugins: [],
-}
+};
