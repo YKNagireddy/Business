@@ -37,9 +37,17 @@ const BusinessMembers = ({ otherBusinessItems }) => {
     if (!searchTerm.trim()) return otherBusinessItems;
     const lower = searchTerm.toLowerCase();
     return otherBusinessItems.filter((item) => {
-      const inKeywords = item.Keywords?.some((k) => k.toLowerCase().includes(lower));
+      const inKeywords = item.companies?.some((company) =>
+        company.keywords?.some((keyword) =>
+          keyword.toLowerCase().includes(lower)
+        )
+      );
+
+      const inCompany = item.companies?.some((company) =>
+        company.companyName?.toLowerCase().includes(lower)
+      );
       const inName = item.name?.toLowerCase().includes(lower);
-      const inCompany = item.company?.toLowerCase().includes(lower);
+      // const inCompany = item.company?.toLowerCase().includes(lower);
       return inKeywords || inName || inCompany;
     });
   }, [otherBusinessItems, searchTerm]);
@@ -147,11 +155,10 @@ const BusinessMembers = ({ otherBusinessItems }) => {
                       <button
                         key={p}
                         onClick={() => goToPage(p)}
-                        className={`w-9 h-9 rounded-full text-xs font-mono font-semibold transition ${
-                          p === currentPage
+                        className={`w-9 h-9 rounded-full text-xs font-mono font-semibold transition ${p === currentPage
                             ? 'bg-gold text-ink'
                             : 'bg-white border border-paper-line text-slate hover:border-gold'
-                        }`}
+                          }`}
                       >
                         {p}
                       </button>

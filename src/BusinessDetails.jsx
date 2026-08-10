@@ -69,6 +69,8 @@
 const BusinessDetails = ({ business, onBack }) => {
   if (!business) return null;
 
+  console.log("business", business)
+
   return (
     <div className="relative p-6 md:p-10 bg-white rounded-2xl shadow-lg border border-paper-line">
       <button
@@ -94,10 +96,15 @@ const BusinessDetails = ({ business, onBack }) => {
         </div>
 
         <div className="flex flex-col space-y-5">
-          {business.companyLogo ? (
+          {business.companies.map((company) => (
+            <div
+              key={company._id}
+              className="border rounded-xl p-5"
+            >
+          {company.logoUrl  ? (
             <img
-              src={business.companyLogo}
-              alt={business.company}
+              src={company.logoUrl }
+              alt={company.companyName}
               className="w-44 h-44 object-contain border border-paper-line rounded-xl bg-paper p-2"
             />
           ) : (
@@ -107,17 +114,18 @@ const BusinessDetails = ({ business, onBack }) => {
           )}
 
           <h3 className="font-display text-xl font-semibold text-ink">
-            {business.company}
+            {company.companyName}
           </h3>
 
           <ul className="space-y-2 text-slate text-sm leading-relaxed font-body">
-            {business.Keywords?.map((item, idx) => (
+            {company.keywords?.map((keyword, idx) => (
               <li key={idx} className="flex items-start gap-2">
                 <span className="text-gold mt-1">◆</span>
-                <span>{item}</span>
+                <span>{keyword}</span>
               </li>
             ))}
           </ul>
+          </div>))}
         </div>
       </div>
     </div>
