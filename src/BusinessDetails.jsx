@@ -66,68 +66,130 @@
 // };
 
 // export default BusinessDetails;
-const BusinessDetails = ({ business, onBack }) => {
-  if (!business) return null;
+// const BusinessDetails = ({ business, onBack }) => {
+//   if (!business) return null;
 
-  console.log("business", business)
+//   console.log("business", business)
+
+//   return (
+//     <div className="relative p-6 md:p-10 bg-white rounded-2xl shadow-lg border border-paper-line">
+//       <button
+//         onClick={onBack}
+//         className="absolute top-4 left-4 md:top-6 md:left-6 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide
+//                    bg-paper text-ink rounded-full
+//                    hover:bg-gold hover:text-ink transition"
+//       >
+//         ← Back
+//       </button>
+
+//       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start mt-10">
+//         <div className="flex flex-col items-center md:items-start text-center md:text-left">
+//           <img
+//             src={business.src}
+//             alt={business.name}
+//             className="w-56 h-56 object-contain rounded-xl border border-paper-line mb-5 bg-paper p-2"
+//           />
+//           <p className="eyebrow text-gold mb-1">BNI Member</p>
+//           <h2 className="font-display text-2xl font-semibold text-ink">
+//             {business.name}
+//           </h2>
+//         </div>
+
+//         <div className="flex flex-col space-y-5">
+//           {business.companies.map((company) => (
+//             <div
+//               key={company._id}
+//               className="border rounded-xl p-5"
+//             >
+//           {company.logoUrl  ? (
+//             <img
+//               src={company.logoUrl }
+//               alt={company.companyName}
+//               className="w-44 h-44 object-contain border border-paper-line rounded-xl bg-paper p-2"
+//             />
+//           ) : (
+//             <div className="w-full flex items-center justify-center">
+//               <span className="text-transparent select-none">.</span>
+//             </div>
+//           )}
+
+//           <h3 className="font-display text-xl font-semibold text-ink">
+//             {company.companyName}
+//           </h3>
+
+//           <ul className="space-y-2 text-slate text-sm leading-relaxed font-body">
+//             {company.keywords?.map((keyword, idx) => (
+//               <li key={idx} className="flex items-start gap-2">
+//                 <span className="text-gold mt-1">◆</span>
+//                 <span>{keyword}</span>
+//               </li>
+//             ))}
+//           </ul>
+//           </div>))}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default BusinessDetails;
+import React from 'react';
+
+// ---------------------------------------------------------------------------
+// KeywordList
+//
+// Second level of the browse flow: every unique keyword/service that
+// appears under the chosen category, shown as clickable chips — no
+// business names or logos yet. Clicking a keyword hands off to the
+// contact-admin step (BusinessMembers renders ContactAdminCard next).
+// ---------------------------------------------------------------------------
+
+const BusinessDetails = ({ category, onSelectKeyword, onBack }) => {
+  if (!category) return null;
 
   return (
-    <div className="relative p-6 md:p-10 bg-white rounded-2xl shadow-lg border border-paper-line">
+    <div className="bg-white p-6 md:p-10 rounded-2xl border border-paper-line">
       <button
+        type="button"
         onClick={onBack}
-        className="absolute top-4 left-4 md:top-6 md:left-6 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide
+        className="mb-6 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide
                    bg-paper text-ink rounded-full
                    hover:bg-gold hover:text-ink transition"
       >
-        ← Back
+        ← All categories
       </button>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start mt-10">
-        <div className="flex flex-col items-center md:items-start text-center md:text-left">
-          <img
-            src={business.src}
-            alt={business.name}
-            className="w-56 h-56 object-contain rounded-xl border border-paper-line mb-5 bg-paper p-2"
-          />
-          <p className="eyebrow text-gold mb-1">BNI Member</p>
-          <h2 className="font-display text-2xl font-semibold text-ink">
-            {business.name}
-          </h2>
-        </div>
+      <p className="eyebrow text-gold mb-1">Category</p>
+      <h3 className="font-display text-2xl font-semibold text-ink mb-1">
+        {category.name}
+      </h3>
+      <p className="text-sm text-slate-soft font-body mb-8">
+        {category.count} member{category.count !== 1 ? 's' : ''} · pick a service below
+      </p>
 
-        <div className="flex flex-col space-y-5">
-          {business.companies.map((company) => (
-            <div
-              key={company._id}
-              className="border rounded-xl p-5"
+      {category.keywords.length === 0 ? (
+        <p className="text-center py-8 text-slate-soft font-body">
+          No services listed for this category yet.
+        </p>
+      ) : (
+        <div className="flex flex-wrap gap-3">
+          {category.keywords.map((keyword) => (
+            <button
+              key={keyword}
+              type="button"
+              onClick={() => onSelectKeyword(keyword)}
+              className="
+                px-4 py-2 rounded-full text-sm font-body
+                border border-paper-line bg-paper text-ink
+                hover:border-gold hover:bg-white
+                transition
+              "
             >
-          {company.logoUrl  ? (
-            <img
-              src={company.logoUrl }
-              alt={company.companyName}
-              className="w-44 h-44 object-contain border border-paper-line rounded-xl bg-paper p-2"
-            />
-          ) : (
-            <div className="w-full flex items-center justify-center">
-              <span className="text-transparent select-none">.</span>
-            </div>
-          )}
-
-          <h3 className="font-display text-xl font-semibold text-ink">
-            {company.companyName}
-          </h3>
-
-          <ul className="space-y-2 text-slate text-sm leading-relaxed font-body">
-            {company.keywords?.map((keyword, idx) => (
-              <li key={idx} className="flex items-start gap-2">
-                <span className="text-gold mt-1">◆</span>
-                <span>{keyword}</span>
-              </li>
-            ))}
-          </ul>
-          </div>))}
+              {keyword}
+            </button>
+          ))}
         </div>
-      </div>
+      )}
     </div>
   );
 };
