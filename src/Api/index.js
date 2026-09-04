@@ -5,7 +5,7 @@ const API_BASE = `${process.env.REACT_APP_API_URL}`;
 
 export const getAllPersons = async (search = '') => {
     try {
-        const response = await axios.get(`${API_BASE}api/person`, {
+        const response = await axios.get(`${API_BASE}api`, {
             params: search ? { search } : {},
         });
         return response.data;

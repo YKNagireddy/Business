@@ -187,8 +187,11 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import OtherBusinessImage from '../OtherBusinessImage';
 import BusinessDetails from '../BusinessDetails';
 import ContactAdminCard from './ContactAdminCard';
+import SignupForm from './SignupForm';
+import PaymentPage from './PaymentPage';
 
 const ITEMS_PER_PAGE = 10;
+const VERIFIED_USER_KEY = 'bni_verified_user';
 
 // Builds a compact page list like: 1 2 3 ... 14 15 16 ... 29 30
 const getPageRange = (current, total) => {
@@ -217,11 +220,26 @@ const BusinessMembers = ({ otherBusinessItems }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Browse state machine: null -> category chosen -> keyword chosen.
-  // Business identity is never surfaced — this is the whole point of the
-  // category -> keyword -> contact-admin gate.
+  // Browse state machine:
+  //   category chosen -> (signup+OTP if not already verified) -> keywords
+  //   -> keyword chosen -> payment -> contact admin
+  // Business identity is never surfaced along the way — that's the whole
+  // point of gating by category -> keyword -> payment -> contact-admin.
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedKeyword, setSelectedKeyword] = useState(null);
+  const [paymentDone, setPaymentDone] = useState(false);
+
+  // Signup/OTP only needs to happen once per visitor — remembered in
+  // localStorage so re-entering a different category later (or coming
+  // back tomorrow) skips straight to the keyword list.
+  const [verifiedUser, setVerifiedUser] = useState(() => {
+    try {
+      const raw = localStorage.getItem(VERIFIED_USER_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
 
   // -------------------------------------------------------------------------
   // Derive categories (with member counts and the union of their
@@ -313,14 +331,32 @@ const BusinessMembers = ({ otherBusinessItems }) => {
     setSelectedKeyword(null);
   };
 
-  const handleSelectKeyword = (keyword) => setSelectedKeyword(keyword);
+  const handleSelectKeyword = (keyword) => {
+    setSelectedKeyword(keyword);
+    setPaymentDone(false);
+  };
 
-  const handleBackToKeywords = () => setSelectedKeyword(null);
+  const handleBackToKeywords = () => {
+    setSelectedKeyword(null);
+    setPaymentDone(false);
+  };
 
   const handleBackToCategories = () => {
     setSelectedCategory(null);
     setSelectedKeyword(null);
+    setPaymentDone(false);
   };
+
+  const handleVerified = (userData) => {
+    setVerifiedUser(userData);
+    try {
+      localStorage.setItem(VERIFIED_USER_KEY, JSON.stringify(userData));
+    } catch {
+      /* localStorage unavailable — signup still works, just won't persist */
+    }
+  };
+
+  const handlePaid = () => setPaymentDone(true);
 
   // Scrolls to the site's existing contact section instead of duplicating
   // a contact form here. Requires `<section id="contact">` (or similar)
@@ -372,7 +408,12 @@ const BusinessMembers = ({ otherBusinessItems }) => {
         )}
 
         <div className="min-h-[50vh]">
-          {selectedKeyword ? (
+          {selectedCategory && !verifiedUser ? (
+            <SignupForm
+              onVerified={handleVerified}
+              onCancel={handleBackToCategories}
+            />
+          ) : selectedKeyword && paymentDone ? (
             <ContactAdminCard
               keyword={selectedKeyword}
               category={selectedCategory}
@@ -381,6 +422,15 @@ const BusinessMembers = ({ otherBusinessItems }) => {
               onGoToContact={handleGoToContact}
               // adminEmail="hello@yourdomain.com"
               // adminPhone="+91XXXXXXXXXX"
+            />
+          ) : selectedKeyword ? (
+            <PaymentPage
+              keyword={selectedKeyword}
+              category={selectedCategory}
+              onPaid={handlePaid}
+              onBack={handleBackToKeywords}
+              // upiId="yourupi@bank"
+              // amount={99}
             />
           ) : selectedCategory ? (
             <BusinessDetails
