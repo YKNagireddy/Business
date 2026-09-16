@@ -1,84 +1,233 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { signup, verifyOtp } from '../Api/otp.js';
+import React, { useState, useEffect, useRef } from "react";
 
-const RESEND_COOLDOWN = 30; // seconds
+import { signup, verifyOtp } from "../Api/otp.js";
+
+const RESEND_COOLDOWN = 900; // seconds
 
 const SignupForm = ({ onVerified, onCancel }) => {
-  const [step, setStep] = useState('details'); // 'details' | 'otp'
-  const [name, setName] = useState('');
-  const [mobile, setMobile] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [otp, setOtp] = useState('');
-  const [error, setError] = useState('');
+  const [step, setStep] = useState("details"); // 'details' | 'otp'
+
+  const [name, setName] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [otp, setOtp] = useState("");
+
+  // Store MongoDB user ID here
+  const [userId, setUserId] = useState("");
+
+  const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+
   const timerRef = useRef(null);
 
   useEffect(() => {
     if (cooldown <= 0) return undefined;
-    timerRef.current = setTimeout(() => setCooldown((c) => c - 1), 1000);
+
+    timerRef.current = setTimeout(() => {
+      setCooldown((c) => c - 1);
+    }, 1000);
+
     return () => clearTimeout(timerRef.current);
   }, [cooldown]);
 
   const validateDetails = () => {
-    if (!name.trim()) return 'Please enter your name.';
-    if (!/^\d{10}$/.test(mobile.trim())) return 'Enter a valid 10-digit mobile number.';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return 'Enter a valid email address.';
-    if (!password.trim()) return 'Please enter your password.';
-    return '';
+    if (!name.trim()) {
+      return "Please enter your name.";
+    }
+
+    if (!/^\d{10}$/.test(mobile.trim())) {
+      return "Enter a valid 10-digit mobile number.";
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      return "Enter a valid email address.";
+    }
+
+    if (!password.trim()) {
+      return "Please enter your password.";
+    }
+
+    return "";
   };
 
+  // ---------------------------------------------------------
+  // SIGNUP + SEND OTP
+  // ---------------------------------------------------------
   const handleSendOtp = async (e) => {
     e.preventDefault();
+
     const validationError = validateDetails();
+
     if (validationError) {
       setError(validationError);
       return;
     }
 
-    setError('');
+    setError("");
     setSubmitting(true);
+
     try {
-      await signup({ name: name.trim(), mobile: mobile.trim(), email: email.trim(), password: password.trim() });
-      setStep('otp');
+      const response = await signup({
+        name: name.trim(),
+        mobile: mobile.trim(),
+        email: email.trim(),
+        password: password.trim(),
+      });
+
+      console.log("Signup response:", response);
+
+      /*
+        Your backend response:
+
+        {
+          success: true,
+          data: {
+            name: "...",
+            email: "...",
+            mobilenumber: "...",
+            isEmailVerified: false,
+            _id: "6a9ab783e55c8b0561c2092c"
+          }
+        }
+      */
+
+      const newUserId = response?.data?._id;
+
+      if (!newUserId) {
+        throw new Error("User ID was not returned from signup.");
+      }
+
+      // Store MongoDB user ID in React state
+      setUserId(newUserId);
+
+      // Also store it in sessionStorage
+      sessionStorage.setItem("otpUserId", newUserId);
+
+      // Optional: store email
+      sessionStorage.setItem("otpEmail", email.trim());
+
+      console.log("User ID saved:", newUserId);
+
+      // Move to OTP screen
+      setStep("otp");
+
+      // Start resend timer
       setCooldown(RESEND_COOLDOWN);
     } catch (err) {
-      setError(err.message || 'Could not send OTP. Please try again.');
+      console.error("Signup error:", err);
+
+      setError(
+        err.message || "Could not send OTP. Please try again."
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
+  // ---------------------------------------------------------
+  // RESEND OTP
+  // ---------------------------------------------------------
   const handleResend = async () => {
     if (cooldown > 0 || submitting) return;
-    setError('');
+
+    setError("");
     setSubmitting(true);
+
     try {
-      await signup({ name: name.trim(), mobile: mobile.trim(), email: email.trim(), password: password.trim() });
+      const response = await signup({
+        name: name.trim(),
+        mobile: mobile.trim(),
+        email: email.trim(),
+        password: password.trim(),
+      });
+
+      console.log("Resend signup response:", response);
+
+      /*
+        If your signup API creates/returns the same user,
+        this will keep the user ID updated.
+      */
+
+      const newUserId = response?.data?._id;
+
+      if (newUserId) {
+        setUserId(newUserId);
+        sessionStorage.setItem("otpUserId", newUserId);
+      }
+
       setCooldown(RESEND_COOLDOWN);
     } catch (err) {
-      setError(err.message || 'Could not resend OTP.');
+      console.error("Resend OTP error:", err);
+
+      setError(
+        err.message || "Could not resend OTP."
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
+  // ---------------------------------------------------------
+  // VERIFY OTP
+  // ---------------------------------------------------------
   const handleVerify = async (e) => {
     e.preventDefault();
+
     if (!/^\d{4,6}$/.test(otp.trim())) {
-      setError('Enter the OTP you received.');
+      setError("Enter the OTP you received.");
       return;
     }
 
-    setError('');
+    setError("");
     setSubmitting(true);
+
     try {
-      // Passing email instead of mobile to verify endpoint if required by backend
-      await verifyOtp({ email: email.trim(), otp: otp.trim() });
-      onVerified({ name: name.trim(), mobile: mobile.trim(), email: email.trim() });
+      /*
+        First use React state.
+        If state is empty, get it from sessionStorage.
+      */
+      const storedUserId =
+        userId || sessionStorage.getItem("otpUserId");
+
+      if (!storedUserId) {
+        throw new Error(
+          "User ID not found. Please signup again."
+        );
+      }
+
+      console.log("Verifying OTP with:", {
+        userId: storedUserId,
+        otp: otp.trim(),
+      });
+
+      // IMPORTANT:
+      // Send MongoDB _id, NOT email
+      const response = await verifyOtp({
+        userId: storedUserId,
+        otp: otp.trim(),
+      });
+
+      console.log("OTP verification response:", response);
+
+      // Remove temporary OTP data
+      sessionStorage.removeItem("otpUserId");
+      sessionStorage.removeItem("otpEmail");
+
+      // OTP verified successfully
+      onVerified({
+        name: name.trim(),
+        mobile: mobile.trim(),
+        email: email.trim(),
+      });
     } catch (err) {
-      setError(err.message || 'Invalid or expired OTP.');
+      console.error("OTP verification error:", err);
+
+      setError(
+        err.message || "Invalid or expired OTP."
+      );
     } finally {
       setSubmitting(false);
     }
@@ -86,91 +235,173 @@ const SignupForm = ({ onVerified, onCancel }) => {
 
   return (
     <div className="bg-white p-6 md:p-10 rounded-2xl border border-paper-line max-w-md mx-auto">
+
       <button
         type="button"
         onClick={onCancel}
-        className="mb-6 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide
-                   bg-paper text-ink rounded-full
-                   hover:bg-gold hover:text-ink transition"
+        className="
+          mb-6 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide
+          bg-paper text-ink rounded-full
+          hover:bg-gold hover:text-ink transition
+        "
       >
         ← All categories
       </button>
 
-      <p className="eyebrow text-gold mb-1">One quick step</p>
+      <p className="eyebrow text-gold mb-1">
+        One quick step
+      </p>
+
       <h3 className="font-display text-2xl font-semibold text-ink mb-1">
-        {step === 'details' ? 'Sign up to continue' : 'Verify your email address'}
+        {step === "details"
+          ? "Sign up to continue"
+          : "Verify your email address"}
       </h3>
+
       <p className="text-sm text-slate-soft font-body mb-8">
-        {step === 'details'
-          ? 'We just need a few details before showing member services.'
+        {step === "details"
+          ? "We just need a few details before showing member services."
           : `Enter the OTP sent to ${email}.`}
       </p>
 
-      {error && <p className="text-sm text-red-600 font-body mb-4">{error}</p>}
+      {error && (
+        <p className="text-sm text-red-600 font-body mb-4">
+          {error}
+        </p>
+      )}
 
-      {step === 'details' ? (
-        <form onSubmit={handleSendOtp} className="space-y-4">
+      {step === "details" ? (
+        <form
+          onSubmit={handleSendOtp}
+          className="space-y-4"
+        >
           <input
             type="text"
             placeholder="Full name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full border border-paper-line rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/50 transition"
+            className="
+              w-full border border-paper-line rounded-full
+              px-5 py-3 text-sm
+              focus:outline-none focus:ring-2 focus:ring-gold/50
+              transition
+            "
           />
+
           <input
             type="tel"
             inputMode="numeric"
             placeholder="Mobile number"
             value={mobile}
-            onChange={(e) => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
-            className="w-full border border-paper-line rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/50 transition"
+            onChange={(e) =>
+              setMobile(
+                e.target.value
+                  .replace(/\D/g, "")
+                  .slice(0, 10)
+              )
+            }
+            className="
+              w-full border border-paper-line rounded-full
+              px-5 py-3 text-sm
+              focus:outline-none focus:ring-2 focus:ring-gold/50
+              transition
+            "
           />
+
           <input
             type="email"
             placeholder="Email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border border-paper-line rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/50 transition"
+            className="
+              w-full border border-paper-line rounded-full
+              px-5 py-3 text-sm
+              focus:outline-none focus:ring-2 focus:ring-gold/50
+              transition
+            "
           />
+
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-paper-line rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/50 transition"
+            className="
+              w-full border border-paper-line rounded-full
+              px-5 py-3 text-sm
+              focus:outline-none focus:ring-2 focus:ring-gold/50
+              transition
+            "
           />
+
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-3 rounded-full text-sm font-semibold bg-gold text-ink hover:brightness-95 disabled:opacity-50 transition"
+            className="
+              w-full py-3 rounded-full text-sm font-semibold
+              bg-gold text-ink
+              hover:brightness-95
+              disabled:opacity-50 transition
+            "
           >
-            {submitting ? 'Sending OTP…' : 'Send OTP'}
+            {submitting
+              ? "Sending OTP…"
+              : "Send OTP"}
           </button>
         </form>
       ) : (
-        <form onSubmit={handleVerify} className="space-y-4">
+        <form
+          onSubmit={handleVerify}
+          className="space-y-4"
+        >
           <input
             type="text"
             inputMode="numeric"
             placeholder="Enter OTP"
             value={otp}
-            onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            className="w-full border border-paper-line rounded-full px-5 py-3 text-sm text-center tracking-[0.5em] focus:outline-none focus:ring-2 focus:ring-gold/50 transition"
+            onChange={(e) =>
+              setOtp(
+                e.target.value
+                  .replace(/\D/g, "")
+                  .slice(0, 6)
+              )
+            }
+            className="
+              w-full border border-paper-line rounded-full
+              px-5 py-3 text-sm text-center tracking-[0.5em]
+              focus:outline-none focus:ring-2 focus:ring-gold/50
+              transition
+            "
           />
+
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-3 rounded-full text-sm font-semibold bg-gold text-ink hover:brightness-95 disabled:opacity-50 transition"
+            className="
+              w-full py-3 rounded-full text-sm font-semibold
+              bg-gold text-ink
+              hover:brightness-95
+              disabled:opacity-50 transition
+            "
           >
-            {submitting ? 'Verifying…' : 'Verify & Continue'}
+            {submitting
+              ? "Verifying…"
+              : "Verify & Continue"}
           </button>
+
           <button
             type="button"
             onClick={handleResend}
             disabled={cooldown > 0 || submitting}
-            className="w-full text-xs font-semibold text-slate-soft hover:text-ink disabled:opacity-50 transition"
+            className="
+              w-full text-xs font-semibold text-slate-soft
+              hover:text-ink
+              disabled:opacity-50 transition
+            "
           >
-            {cooldown > 0 ? `Resend OTP in ${cooldown}s` : 'Resend OTP'}
+            {cooldown > 0
+              ? `Resend OTP in ${cooldown}s`
+              : "Resend OTP"}
           </button>
         </form>
       )}

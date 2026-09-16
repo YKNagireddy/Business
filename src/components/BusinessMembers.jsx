@@ -1,199 +1,26 @@
-// import React, { useMemo, useState, useEffect } from 'react';
-// import OtherBusinessImage from '../OtherBusinessImage';
-// import BusinessDetails from '../BusinessDetails';
+import React, {
+  useMemo,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
 
-// const ITEMS_PER_PAGE = 10;
-
-// // Builds a compact page list like: 1 2 3 ... 14 15 16 ... 29 30
-// const getPageRange = (current, total) => {
-//   const delta = 2;
-//   const range = [];
-//   const rangeWithDots = [];
-//   let last;
-
-//   for (let i = 1; i <= total; i++) {
-//     if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
-//       range.push(i);
-//     }
-//   }
-//   range.forEach((i) => {
-//     if (last) {
-//       if (i - last === 2) rangeWithDots.push(last + 1);
-//       else if (i - last > 2) rangeWithDots.push('...');
-//     }
-//     rangeWithDots.push(i);
-//     last = i;
-//   });
-//   return rangeWithDots;
-// };
-
-// const BusinessMembers = ({ otherBusinessItems }) => {
-//   const [selectedBusiness, setSelectedBusiness] = useState(null);
-//   const [searchTerm, setSearchTerm] = useState('');
-//   const [currentPage, setCurrentPage] = useState(1);
-
-//   // Filter once here — single source of truth for both the grid and pagination math.
-//   const filteredItems = useMemo(() => {
-//     if (!searchTerm.trim()) return otherBusinessItems;
-//     const lower = searchTerm.toLowerCase();
-//     return otherBusinessItems.filter((item) => {
-//       const inKeywords = item.companies?.some((company) =>
-//         company.keywords?.some((keyword) =>
-//           keyword.toLowerCase().includes(lower)
-//         )
-//       );
-
-//       const inCompany = item.companies?.some((company) =>
-//         company.companyName?.toLowerCase().includes(lower)
-//       );
-//       const inName = item.name?.toLowerCase().includes(lower);
-//       // const inCompany = item.company?.toLowerCase().includes(lower);
-//       return inKeywords || inName || inCompany;
-//     });
-//   }, [otherBusinessItems, searchTerm]);
-
-//   const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
-
-//   // Only reset to page 1 when the SEARCH changes — never when opening/closing a detail card.
-//   useEffect(() => {
-//     setCurrentPage(1);
-//   }, [searchTerm]);
-
-//   // If filtering ever leaves currentPage out of range (e.g. searched while on page 20), clamp it.
-//   useEffect(() => {
-//     if (currentPage > totalPages) setCurrentPage(totalPages);
-//   }, [totalPages, currentPage]);
-
-//   const paginatedItems = filteredItems.slice(
-//     (currentPage - 1) * ITEMS_PER_PAGE,
-//     currentPage * ITEMS_PER_PAGE
-//   );
-
-//   const gridTopRef = React.useRef(null);
-//   const scrollToGridTop = () => {
-//     gridTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-//   };
-
-//   const goToPage = (page) => {
-//     if (page < 1 || page > totalPages || page === currentPage) return;
-//     setCurrentPage(page);
-//     scrollToGridTop();
-//   };
-
-//   return (
-//     <section id="members" className="bg-paper py-24 px-6">
-//       <div className="max-w-7xl mx-auto">
-//         <div className="flex justify-center mb-10">
-//           <svg width="160" height="28" viewBox="0 0 160 28">
-//             <line x1="20" y1="14" x2="140" y2="14" stroke="#C8973B" strokeWidth="1" strokeDasharray="3 5" />
-//             <circle cx="20" cy="14" r="4" fill="#1F5C57" />
-//             <circle cx="80" cy="14" r="3" fill="#C8973B" />
-//             <circle cx="140" cy="14" r="4" fill="#1F5C57" />
-//           </svg>
-//         </div>
-
-//         <div ref={gridTopRef} className="text-center mb-10 scroll-mt-24">
-//           <p className="eyebrow text-teal mb-3">BNI Referral Network</p>
-//           <h2 className="font-display font-semibold text-3xl md:text-4xl text-ink mb-4">
-//             Business Members
-//           </h2>
-//           <p className="text-slate-soft font-body max-w-xl mx-auto text-sm md:text-base">
-//             A trusted circle of business owners across industries — click a card for full
-//             details, or search by name, company, or service.
-//           </p>
-//         </div>
-
-//         {!selectedBusiness && (
-//           <>
-//             <div className="mb-3 flex justify-center">
-//               <input
-//                 type="text"
-//                 placeholder="Search by keyword, name, or company..."
-//                 value={searchTerm}
-//                 onChange={(e) => setSearchTerm(e.target.value)}
-//                 className="border border-paper-line bg-white rounded-full px-5 py-3 w-full md:w-[28rem] text-sm focus:outline-none focus:ring-2 focus:ring-gold/50 transition"
-//               />
-//             </div>
-//             <p className="text-center text-xs text-slate-soft font-mono mb-8">
-//               {filteredItems.length} member{filteredItems.length !== 1 ? 's' : ''}
-//               {totalPages > 1 && ` · page ${currentPage} of ${totalPages}`}
-//             </p>
-//           </>
-//         )}
-
-//         <div className="min-h-[50vh]">
-//           {selectedBusiness ? (
-//             <div className="bg-white p-4 md:p-6 rounded-2xl">
-//               <BusinessDetails
-//                 business={selectedBusiness}
-//                 onBack={() => setSelectedBusiness(null)} // currentPage is untouched — returns to the same page
-//               />
-//             </div>
-//           ) : (
-//             <>
-//               <OtherBusinessImage
-//                 otherBusinessItems={paginatedItems}
-//                 setSelectedBusiness={setSelectedBusiness}
-//               />
-
-//               {totalPages > 1 && (
-//                 <div className="flex flex-wrap justify-center items-center gap-2 mt-12">
-//                   <button
-//                     onClick={() => goToPage(currentPage - 1)}
-//                     disabled={currentPage === 1}
-//                     className="px-3 py-2 rounded-full text-xs font-semibold border border-paper-line bg-white disabled:opacity-40 disabled:cursor-not-allowed hover:border-gold transition"
-//                   >
-//                     ← Prev
-//                   </button>
-
-//                   {getPageRange(currentPage, totalPages).map((p, i) =>
-//                     p === '...' ? (
-//                       <span key={`dots-${i}`} className="px-2 text-slate-soft text-xs">
-//                         …
-//                       </span>
-//                     ) : (
-//                       <button
-//                         key={p}
-//                         onClick={() => goToPage(p)}
-//                         className={`w-9 h-9 rounded-full text-xs font-mono font-semibold transition ${p === currentPage
-//                             ? 'bg-gold text-ink'
-//                             : 'bg-white border border-paper-line text-slate hover:border-gold'
-//                           }`}
-//                       >
-//                         {p}
-//                       </button>
-//                     )
-//                   )}
-
-//                   <button
-//                     onClick={() => goToPage(currentPage + 1)}
-//                     disabled={currentPage === totalPages}
-//                     className="px-3 py-2 rounded-full text-xs font-semibold border border-paper-line bg-white disabled:opacity-40 disabled:cursor-not-allowed hover:border-gold transition"
-//                   >
-//                     Next →
-//                   </button>
-//                 </div>
-//               )}
-//             </>
-//           )}
-//         </div>
-//       </div>
-//     </section>
-//   );
-// };
-
-// export default BusinessMembers;
-import React, { useMemo, useState, useEffect, useRef } from 'react';
-import OtherBusinessImage from '../OtherBusinessImage';
-import BusinessDetails from '../BusinessDetails';
-import ContactAdminCard from './ContactAdminCard';
-import SignupForm from './SignupForm';
-import PaymentPage from './PaymentPage';
+import OtherBusinessImage from "../OtherBusinessImage";
+import BusinessDetails from "../BusinessDetails";
+import ContactAdminCard from "./ContactAdminCard";
+import SignupForm from "./SignupForm";
+import PaymentPage from "./PaymentPage";
+import LoginForm from "./LoginForm";
+import ForgotPasswordForm from "./ForgotPasswordForm";
+// import ResetPassword from "./RestPassword";
+import { useAuth } from "../Context/AuthContext";
 
 const ITEMS_PER_PAGE = 10;
-const VERIFIED_USER_KEY = 'bni_verified_user';
 
-// Builds a compact page list like: 1 2 3 ... 14 15 16 ... 29 30
+// -----------------------------------------------------------------------------
+// Page range helper
+// -----------------------------------------------------------------------------
+
 const getPageRange = (current, total) => {
   const delta = 2;
   const range = [];
@@ -201,137 +28,236 @@ const getPageRange = (current, total) => {
   let last;
 
   for (let i = 1; i <= total; i++) {
-    if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
+    if (
+      i === 1 ||
+      i === total ||
+      (i >= current - delta &&
+        i <= current + delta)
+    ) {
       range.push(i);
     }
   }
+
   range.forEach((i) => {
     if (last) {
-      if (i - last === 2) rangeWithDots.push(last + 1);
-      else if (i - last > 2) rangeWithDots.push('...');
+      if (i - last === 2) {
+        rangeWithDots.push(last + 1);
+      } else if (i - last > 2) {
+        rangeWithDots.push("...");
+      }
     }
+
     rangeWithDots.push(i);
     last = i;
   });
+
   return rangeWithDots;
 };
 
-const BusinessMembers = ({ otherBusinessItems }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
+// -----------------------------------------------------------------------------
+// Component
+// -----------------------------------------------------------------------------
 
-  // Browse state machine:
-  //   category chosen -> (signup+OTP if not already verified) -> keywords
-  //   -> keyword chosen -> payment -> contact admin
-  // Business identity is never surfaced along the way — that's the whole
-  // point of gating by category -> keyword -> payment -> contact-admin.
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedKeyword, setSelectedKeyword] = useState(null);
-  const [paymentDone, setPaymentDone] = useState(false);
+const BusinessMembers = ({
+  otherBusinessItems,
+}) => {
 
-  // Signup/OTP only needs to happen once per visitor — remembered in
-  // localStorage so re-entering a different category later (or coming
-  // back tomorrow) skips straight to the keyword list.
-  const [verifiedUser, setVerifiedUser] = useState(() => {
-    try {
-      const raw = localStorage.getItem(VERIFIED_USER_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
-  });
+const {
+  user,
+  role,
+  isAdmin,
+  isMember,
+  hasRole,
+  isAuthenticated,
+  loading: authLoading,
+  logout,       // context version — clears user state too
+  checkAuth,
+} = useAuth();
 
-  // -------------------------------------------------------------------------
-  // Derive categories (with member counts and the union of their
-  // keywords) from the flattened person/company list once, then re-derive
-  // only when the source data changes.
-  // -------------------------------------------------------------------------
+  const [searchTerm, setSearchTerm] =
+    useState("");
+
+  const [currentPage, setCurrentPage] =
+    useState(1);
+
+  // ---------------------------------------------------------------------------
+  // Browse state
+  // ---------------------------------------------------------------------------
+
+  const [selectedCategory, setSelectedCategory] =
+    useState(null);
+
+  const [selectedKeyword, setSelectedKeyword] =
+    useState(null);
+
+  const [paymentDone, setPaymentDone] =
+    useState(false);
+  const [authView, setAuthView] = useState("login");
+  const [userMenuOpen, setUserMenuOpen] =
+    useState(false);
+
+  // ---------------------------------------------------------------------------
+  // Categories
+  // ---------------------------------------------------------------------------
 
   const categories = useMemo(() => {
     const map = new Map();
 
     otherBusinessItems.forEach((item) => {
       item.companies?.forEach((company) => {
-        const name = company.category?.trim() || 'Other';
+        const name =
+          company.category?.trim() ||
+          "Other";
 
         if (!map.has(name)) {
-          map.set(name, { name, count: 0, keywords: new Set() });
+          map.set(name, {
+            name,
+            count: 0,
+            keywords: new Set(),
+          });
         }
 
         const entry = map.get(name);
+
         entry.count += 1;
-        (company.keywords || []).forEach((k) => entry.keywords.add(k));
+
+        (company.keywords || []).forEach(
+          (keyword) => {
+            entry.keywords.add(keyword);
+          }
+        );
       });
     });
 
     return Array.from(map.values())
-      .map((c) => ({ ...c, keywords: Array.from(c.keywords).sort() }))
-      .sort((a, b) => a.name.localeCompare(b.name));
+      .map((category) => ({
+        ...category,
+        keywords: Array.from(
+          category.keywords
+        ).sort(),
+      }))
+      .sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
   }, [otherBusinessItems]);
 
-  // Search matches either the category name itself, or any keyword
-  // inside it — in the latter case only the matching keywords are kept,
-  // so a search for "granite" shows "Construction Materials" already
-  // narrowed down instead of every keyword in that category.
+  // ---------------------------------------------------------------------------
+  // Search
+  // ---------------------------------------------------------------------------
+
   const filteredCategories = useMemo(() => {
-    if (!searchTerm.trim()) return categories;
-    const lower = searchTerm.toLowerCase();
+    if (!searchTerm.trim()) {
+      return categories;
+    }
+
+    const lower =
+      searchTerm.toLowerCase();
 
     return categories
-      .map((cat) => {
-        if (cat.name.toLowerCase().includes(lower)) return cat;
+      .map((category) => {
+        if (
+          category.name
+            .toLowerCase()
+            .includes(lower)
+        ) {
+          return category;
+        }
 
-        const matchingKeywords = cat.keywords.filter((k) =>
-          k.toLowerCase().includes(lower)
-        );
+        const matchingKeywords =
+          category.keywords.filter(
+            (keyword) =>
+              keyword
+                .toLowerCase()
+                .includes(lower)
+          );
+
         return matchingKeywords.length > 0
-          ? { ...cat, keywords: matchingKeywords }
+          ? {
+              ...category,
+              keywords:
+                matchingKeywords,
+            }
           : null;
       })
       .filter(Boolean);
   }, [categories, searchTerm]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredCategories.length / ITEMS_PER_PAGE));
+  // ---------------------------------------------------------------------------
+  // Pagination
+  // ---------------------------------------------------------------------------
 
-  // Only reset to page 1 when the SEARCH changes — never when drilling
-  // into/out of a category or keyword.
+  const totalPages = Math.max(
+    1,
+    Math.ceil(
+      filteredCategories.length /
+        ITEMS_PER_PAGE
+    )
+  );
+
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
 
   useEffect(() => {
-    if (currentPage > totalPages) setCurrentPage(totalPages);
-  }, [totalPages, currentPage]);
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [
+    currentPage,
+    totalPages,
+  ]);
 
-  const paginatedCategories = filteredCategories.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  const paginatedCategories =
+    filteredCategories.slice(
+      (currentPage - 1) *
+        ITEMS_PER_PAGE,
+      currentPage *
+        ITEMS_PER_PAGE
+    );
 
-  const gridTopRef = useRef(null);
+  const gridTopRef =
+    useRef(null);
+
   const scrollToGridTop = () => {
-    gridTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    gridTopRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
   };
 
   const goToPage = (page) => {
-    if (page < 1 || page > totalPages || page === currentPage) return;
+    if (
+      page < 1 ||
+      page > totalPages ||
+      page === currentPage
+    ) {
+      return;
+    }
+
     setCurrentPage(page);
     scrollToGridTop();
   };
 
-  // -------------------------------------------------------------------------
-  // Drill-down handlers
-  // -------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // Browse handlers
+  // ---------------------------------------------------------------------------
 
-  const handleSelectCategory = (category) => {
-    // Look the category up fresh (unfiltered) so entering it always shows
-    // every keyword, even if it was reached via a narrowing search.
-    const full = categories.find((c) => c.name === category.name) || category;
+  const handleSelectCategory = (
+    category
+  ) => {
+    const full =
+      categories.find(
+        (item) =>
+          item.name === category.name
+      ) || category;
+
     setSelectedCategory(full);
     setSelectedKeyword(null);
   };
 
-  const handleSelectKeyword = (keyword) => {
+  const handleSelectKeyword = (
+    keyword
+  ) => {
     setSelectedKeyword(keyword);
     setPaymentDone(false);
   };
@@ -345,147 +271,641 @@ const BusinessMembers = ({ otherBusinessItems }) => {
     setSelectedCategory(null);
     setSelectedKeyword(null);
     setPaymentDone(false);
+    setAuthView("login");
   };
 
-  const handleVerified = (userData) => {
-    setVerifiedUser(userData);
-    try {
-      localStorage.setItem(VERIFIED_USER_KEY, JSON.stringify(userData));
-    } catch {
-      /* localStorage unavailable — signup still works, just won't persist */
-    }
+  // ---------------------------------------------------------------------------
+  // Login
+  // ---------------------------------------------------------------------------
+const handleLoggedIn = async () => {
+  await checkAuth();
+  setAuthView("login");
+  setUserMenuOpen(false);
+};
+
+  // ---------------------------------------------------------------------------
+  // Signup verification
+  //
+  // For frontend stage we receive the user data from SignupForm.
+  // Backend authentication/session will be connected later.
+  // ---------------------------------------------------------------------------
+
+  const handleVerified = async () => {
+  await checkAuth();
+  setAuthView("login");
+  setUserMenuOpen(false);
+};
+
+  // ---------------------------------------------------------------------------
+  // Logout
+  // ---------------------------------------------------------------------------
+
+  const handleLogout = async () => {
+  try {
+    await logout();
+  } catch (error) {
+    console.error(
+      "Logout error:",
+      error
+    );
+  } finally {
+    setUserMenuOpen(false);
+
+    setSelectedCategory(null);
+    setSelectedKeyword(null);
+    setPaymentDone(false);
+
+    setAuthView("login");
+  }
+};
+
+  // ---------------------------------------------------------------------------
+  // Payment
+  // ---------------------------------------------------------------------------
+
+  const handlePaid = () => {
+    setPaymentDone(true);
   };
 
-  const handlePaid = () => setPaymentDone(true);
+  // ---------------------------------------------------------------------------
+  // Contact
+  // ---------------------------------------------------------------------------
 
-  // Scrolls to the site's existing contact section instead of duplicating
-  // a contact form here. Requires `<section id="contact">` (or similar)
-  // to exist somewhere on the page — add that id to ContactSection's
-  // wrapping element if it isn't already there.
   const handleGoToContact = () => {
-    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+    document
+      .getElementById("contact")
+      ?.scrollIntoView({
+        behavior: "smooth",
+      });
   };
+
+  // ---------------------------------------------------------------------------
+  // Loading authentication
+  // ---------------------------------------------------------------------------
+
+  if (authLoading) {
+    return (
+      <section
+        id="members"
+        className="bg-paper py-24 px-6"
+      >
+        <div className="max-w-7xl mx-auto">
+
+          <div className="flex justify-center mb-10">
+            <svg
+              width="160"
+              height="28"
+              viewBox="0 0 160 28"
+            >
+              <line
+                x1="20"
+                y1="14"
+                x2="140"
+                y2="14"
+                stroke="#C8973B"
+                strokeWidth="1"
+                strokeDasharray="3 5"
+              />
+
+              <circle
+                cx="20"
+                cy="14"
+                r="4"
+                fill="#1F5C57"
+              />
+
+              <circle
+                cx="80"
+                cy="14"
+                r="3"
+                fill="#C8973B"
+              />
+
+              <circle
+                cx="140"
+                cy="14"
+                r="4"
+                fill="#1F5C57"
+              />
+            </svg>
+          </div>
+
+          <div className="text-center">
+            <p className="text-sm text-slate-soft">
+              Checking login…
+            </p>
+          </div>
+
+        </div>
+      </section>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Main render
+  // ---------------------------------------------------------------------------
 
   return (
-    <section id="members" className="bg-paper py-24 px-6">
+    <section
+      id="members"
+      className="bg-paper py-24 px-6"
+    >
       <div className="max-w-7xl mx-auto">
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Logged-in user - TOP RIGHT                                         */}
+        {/* ------------------------------------------------------------------ */}
+
+        {user && (
+          <div className="flex justify-end mb-6 relative">
+
+            <div className="relative">
+
+              <button
+                type="button"
+                onClick={() =>
+                  setUserMenuOpen(
+                    (open) => !open
+                  )
+                }
+                className="
+                  flex items-center gap-3
+                  bg-white
+                  border border-paper-line
+                  rounded-full
+                  px-3 py-2
+                  shadow-sm
+                  hover:border-gold
+                  transition
+                "
+              >
+
+                {/* Avatar */}
+
+                <div
+                  className="
+                    w-8 h-8 rounded-full
+                    bg-teal text-white
+                    flex items-center
+                    justify-center
+                    text-xs font-semibold
+                  "
+                >
+                  {user.name
+                    ?.charAt(0)
+                    ?.toUpperCase() || "U"}
+                </div>
+
+                {/* Name / email */}
+
+                <div className="text-left hidden sm:block">
+
+                  <p className="text-xs font-semibold text-ink">
+                    {user.name ||
+                      "User"}
+                  </p>
+
+                  <p className="text-[11px] text-slate-soft">
+                    {user.email}
+                  </p>
+
+                </div>
+
+                <span className="text-xs text-slate-soft">
+                  ▾
+                </span>
+
+              </button>
+
+              {/* Dropdown */}
+
+              {userMenuOpen && (
+                <div
+                  className="
+                    absolute right-0 mt-2
+                    w-60
+                    bg-white
+                    border border-paper-line
+                    rounded-2xl
+                    shadow-lg
+                    p-2
+                    z-50
+                  "
+                >
+
+                  <div className="px-3 py-2 border-b border-paper-line">
+
+                    <p className="text-xs font-semibold text-ink">
+                      {user.name ||
+                        "User"}
+                    </p>
+
+                    <p className="text-[11px] text-slate-soft break-all">
+                      {user.email}
+                    </p>
+
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="
+                      w-full
+                      text-left
+                      px-3 py-2 mt-1
+                      text-xs font-semibold
+                      text-red-600
+                      rounded-xl
+                      hover:bg-paper
+                      transition
+                    "
+                  >
+                    Logout
+                  </button>
+
+                </div>
+              )}
+
+            </div>
+          </div>
+        )}
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Section decoration                                                 */}
+        {/* ------------------------------------------------------------------ */}
+
         <div className="flex justify-center mb-10">
-          <svg width="160" height="28" viewBox="0 0 160 28">
-            <line x1="20" y1="14" x2="140" y2="14" stroke="#C8973B" strokeWidth="1" strokeDasharray="3 5" />
-            <circle cx="20" cy="14" r="4" fill="#1F5C57" />
-            <circle cx="80" cy="14" r="3" fill="#C8973B" />
-            <circle cx="140" cy="14" r="4" fill="#1F5C57" />
+
+          <svg
+            width="160"
+            height="28"
+            viewBox="0 0 160 28"
+          >
+            <line
+              x1="20"
+              y1="14"
+              x2="140"
+              y2="14"
+              stroke="#C8973B"
+              strokeWidth="1"
+              strokeDasharray="3 5"
+            />
+
+            <circle
+              cx="20"
+              cy="14"
+              r="4"
+              fill="#1F5C57"
+            />
+
+            <circle
+              cx="80"
+              cy="14"
+              r="3"
+              fill="#C8973B"
+            />
+
+            <circle
+              cx="140"
+              cy="14"
+              r="4"
+              fill="#1F5C57"
+            />
           </svg>
+
         </div>
 
-        <div ref={gridTopRef} className="text-center mb-10 scroll-mt-24">
-          <p className="eyebrow text-teal mb-3">BNI Referral Network</p>
-          <h2 className="font-display font-semibold text-3xl md:text-4xl text-ink mb-4">
+        {/* ------------------------------------------------------------------ */}
+        {/* Header                                                              */}
+        {/* ------------------------------------------------------------------ */}
+
+        <div
+          ref={gridTopRef}
+          className="
+            text-center
+            mb-10
+            scroll-mt-24
+          "
+        >
+
+          <p className="eyebrow text-teal mb-3">
+            BNI Referral Network
+          </p>
+
+          <h2 className="
+            font-display
+            font-semibold
+            text-3xl md:text-4xl
+            text-ink
+            mb-4
+          ">
             Business Members
           </h2>
-          <p className="text-slate-soft font-body max-w-xl mx-auto text-sm md:text-base">
-            Browse by category, then by service — reach out to the chapter admin to get
-            connected with the right member.
+
+          <p className="
+            text-slate-soft
+            font-body
+            max-w-xl
+            mx-auto
+            text-sm md:text-base
+          ">
+            Browse by category, then by
+            service — reach out to the
+            chapter admin to get connected
+            with the right member.
           </p>
+
         </div>
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Search                                                              */}
+        {/* ------------------------------------------------------------------ */}
 
         {!selectedCategory && (
           <>
             <div className="mb-3 flex justify-center">
+
               <input
                 type="text"
                 placeholder="Search by category or service..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="border border-paper-line bg-white rounded-full px-5 py-3 w-full md:w-[28rem] text-sm focus:outline-none focus:ring-2 focus:ring-gold/50 transition"
+                onChange={(e) =>
+                  setSearchTerm(
+                    e.target.value
+                  )
+                }
+                className="
+                  border
+                  border-paper-line
+                  bg-white
+                  rounded-full
+                  px-5 py-3
+                  w-full md:w-[28rem]
+                  text-sm
+                  focus:outline-none
+                  focus:ring-2
+                  focus:ring-gold/50
+                  transition
+                "
               />
+
             </div>
-            <p className="text-center text-xs text-slate-soft font-mono mb-8">
-              {filteredCategories.length} categor{filteredCategories.length !== 1 ? 'ies' : 'y'}
-              {totalPages > 1 && ` · page ${currentPage} of ${totalPages}`}
+
+            <p className="
+              text-center
+              text-xs
+              text-slate-soft
+              font-mono
+              mb-8
+            ">
+              {filteredCategories.length}{" "}
+              categor
+              {filteredCategories.length !== 1
+                ? "ies"
+                : "y"}
+
+              {totalPages > 1 &&
+                ` · page ${currentPage} of ${totalPages}`}
             </p>
           </>
         )}
 
+        {/* ------------------------------------------------------------------ */}
+        {/* Main content                                                        */}
+        {/* ------------------------------------------------------------------ */}
+
         <div className="min-h-[50vh]">
-          {selectedCategory && !verifiedUser ? (
-            <SignupForm
-              onVerified={handleVerified}
-              onCancel={handleBackToCategories}
-            />
-          ) : selectedKeyword && paymentDone ? (
+
+          {/* -------------------------------------------------------------- */}
+          {/* Not logged in + category selected                               */}
+          {/* -------------------------------------------------------------- */}
+
+          {selectedCategory &&
+          !user ? (
+            <>
+              {authView === "login" && (
+                <LoginForm
+                  onLoggedIn={
+                    handleLoggedIn
+                  }
+                  onSignup={() =>
+                    setAuthView(
+                      "signup"
+                    )
+                  }
+                  onForgotPassword={() =>
+                    setAuthView(
+                      "forgot"
+                    )
+                  }
+                  onCancel={
+                    handleBackToCategories
+                  }
+                />
+              )}
+
+              {authView === "signup" && (
+                <SignupForm
+                  onVerified={
+                    handleVerified
+                  }
+                  onCancel={() =>
+                    setAuthView(
+                      "login"
+                    )
+                  }
+                />
+              )}
+
+              {authView === "forgot" && (
+                <ForgotPasswordForm
+                  onBack={() =>
+                    setAuthView(
+                      "login"
+                    )
+                  }
+                  onCancel={
+                    handleBackToCategories
+                  }
+                />
+              )}
+            </>
+          ) : selectedKeyword &&
+            paymentDone ? (
+
             <ContactAdminCard
-              keyword={selectedKeyword}
-              category={selectedCategory}
-              onBackToKeywords={handleBackToKeywords}
-              onBackToCategories={handleBackToCategories}
-              onGoToContact={handleGoToContact}
-              // adminEmail="hello@yourdomain.com"
-              // adminPhone="+91XXXXXXXXXX"
+              keyword={
+                selectedKeyword
+              }
+              category={
+                selectedCategory
+              }
+              onBackToKeywords={
+                handleBackToKeywords
+              }
+              onBackToCategories={
+                handleBackToCategories
+              }
+              onGoToContact={
+                handleGoToContact
+              }
             />
+
           ) : selectedKeyword ? (
+
             <PaymentPage
-              keyword={selectedKeyword}
-              category={selectedCategory}
+              keyword={
+                selectedKeyword
+              }
+              category={
+                selectedCategory
+              }
               onPaid={handlePaid}
-              onBack={handleBackToKeywords}
-              // upiId="yourupi@bank"
-              // amount={99}
+              onBack={
+                handleBackToKeywords
+              }
             />
+
           ) : selectedCategory ? (
+
             <BusinessDetails
-              category={selectedCategory}
-              onSelectKeyword={handleSelectKeyword}
-              onBack={handleBackToCategories}
+              category={
+                selectedCategory
+              }
+              onSelectKeyword={
+                handleSelectKeyword
+              }
+              onBack={
+                handleBackToCategories
+              }
             />
+
           ) : (
+
             <>
               <OtherBusinessImage
-                categories={paginatedCategories}
-                onSelectCategory={handleSelectCategory}
+                categories={
+                  paginatedCategories
+                }
+                onSelectCategory={
+                  handleSelectCategory
+                }
               />
 
+              {/* Pagination */}
+
               {totalPages > 1 && (
-                <div className="flex flex-wrap justify-center items-center gap-2 mt-12">
+                <div className="
+                  flex
+                  flex-wrap
+                  justify-center
+                  items-center
+                  gap-2
+                  mt-12
+                ">
+
                   <button
-                    onClick={() => goToPage(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="px-3 py-2 rounded-full text-xs font-semibold border border-paper-line bg-white disabled:opacity-40 disabled:cursor-not-allowed hover:border-gold transition"
+                    onClick={() =>
+                      goToPage(
+                        currentPage - 1
+                      )
+                    }
+                    disabled={
+                      currentPage === 1
+                    }
+                    className="
+                      px-3 py-2
+                      rounded-full
+                      text-xs
+                      font-semibold
+                      border
+                      border-paper-line
+                      bg-white
+                      disabled:opacity-40
+                      disabled:cursor-not-allowed
+                      hover:border-gold
+                      transition
+                    "
                   >
                     ← Prev
                   </button>
 
-                  {getPageRange(currentPage, totalPages).map((p, i) =>
-                    p === '...' ? (
-                      <span key={`dots-${i}`} className="px-2 text-slate-soft text-xs">
+                  {getPageRange(
+                    currentPage,
+                    totalPages
+                  ).map((page, index) =>
+                    page === "..." ? (
+                      <span
+                        key={`dots-${index}`}
+                        className="
+                          px-2
+                          text-slate-soft
+                          text-xs
+                        "
+                      >
                         …
                       </span>
                     ) : (
                       <button
-                        key={p}
-                        onClick={() => goToPage(p)}
-                        className={`w-9 h-9 rounded-full text-xs font-mono font-semibold transition ${p === currentPage
-                            ? 'bg-gold text-ink'
-                            : 'bg-white border border-paper-line text-slate hover:border-gold'
-                          }`}
+                        key={page}
+                        onClick={() =>
+                          goToPage(page)
+                        }
+                        className={`
+                          w-9 h-9
+                          rounded-full
+                          text-xs
+                          font-mono
+                          font-semibold
+                          transition
+                          ${
+                            page ===
+                            currentPage
+                              ? "bg-gold text-ink"
+                              : "bg-white border border-paper-line text-slate hover:border-gold"
+                          }
+                        `}
                       >
-                        {p}
+                        {page}
                       </button>
                     )
                   )}
 
                   <button
-                    onClick={() => goToPage(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-2 rounded-full text-xs font-semibold border border-paper-line bg-white disabled:opacity-40 disabled:cursor-not-allowed hover:border-gold transition"
+                    onClick={() =>
+                      goToPage(
+                        currentPage + 1
+                      )
+                    }
+                    disabled={
+                      currentPage ===
+                      totalPages
+                    }
+                    className="
+                      px-3 py-2
+                      rounded-full
+                      text-xs
+                      font-semibold
+                      border
+                      border-paper-line
+                      bg-white
+                      disabled:opacity-40
+                      disabled:cursor-not-allowed
+                      hover:border-gold
+                      transition
+                    "
                   >
                     Next →
                   </button>
+
                 </div>
               )}
+
             </>
           )}
+
         </div>
+
       </div>
     </section>
   );
