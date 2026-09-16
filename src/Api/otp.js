@@ -15,11 +15,11 @@ export async function signup({ name, mobile, email, password }) {
   return res.json();
 }
 
-export async function verifyOtp({ email, otp }) {
+export async function verifyOtp({ userId, otp }) {
   const res = await fetch(`${BASE_URL}api/otpverify`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, otp }),
+    body: JSON.stringify({ userId, otp }),
   });
 
   if (!res.ok) {
