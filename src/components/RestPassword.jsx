@@ -1,64 +1,175 @@
-import React, { useState } from "react";
-import { forgotPassword } from "../Api/auth.js";
+import React, { useEffect, useState } from "react";
+import { forgotPassword, resetPassword } from "../Api/auth.js";
 
-const ForgotPasswordForm = ({
+/*
+  Step 2 of the forgot-password flow.
+
+  The user got a 6-digit OTP by email. They enter it here together
+  with their new password.
+*/
+
+// The backend ignores repeat OTP requests for 60 seconds,
+// so the Resend button is disabled for the same time.
+const RESEND_COOLDOWN = 60; // seconds
+
+// Must match the backend rules.
+const MIN_PASSWORD_LENGTH = 8;
+const MAX_PASSWORD_LENGTH = 72;
+
+const inputClass = `
+  w-full border border-paper-line rounded-full
+  px-5 py-3 text-sm
+  focus:outline-none
+  focus:ring-2 focus:ring-gold/50
+  transition
+`;
+
+const ResetPasswordForm = ({
+  email,
   onBack,
   onCancel,
+  onChangeEmail,
 }) => {
-  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
+  const [cooldown, setCooldown] = useState(RESEND_COOLDOWN);
+  const [done, setDone] = useState(false);
 
+  // Resend countdown
+  useEffect(() => {
+    if (cooldown <= 0) return undefined;
+
+    const timer = setTimeout(() => {
+      setCooldown((c) => c - 1);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [cooldown]);
+
+  // ---------------------------------------------------------
+  // RESET PASSWORD
+  // ---------------------------------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     setError("");
     setMessage("");
 
-    const cleanEmail = email.trim();
-
-    if (!cleanEmail) {
-      setError("Please enter your email.");
+    if (!/^\d{6}$/.test(otp)) {
+      setError("Enter the 6-digit OTP sent to your email.");
       return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
-      setError("Enter a valid email address.");
+    if (
+      newPassword.length < MIN_PASSWORD_LENGTH ||
+      newPassword.length > MAX_PASSWORD_LENGTH
+    ) {
+      setError(
+        `Password must be between ${MIN_PASSWORD_LENGTH} and ${MAX_PASSWORD_LENGTH} characters.`
+      );
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match.");
       return;
     }
 
     setSubmitting(true);
 
     try {
-      await forgotPassword(cleanEmail);
+      await resetPassword({
+        email,
+        otp,
+        newPassword,
+      });
 
-      /*
-        We intentionally show the same message whether
-        the email exists or not.
+      // Clear sensitive values from React state.
+      setOtp("");
+      setNewPassword("");
+      setConfirmPassword("");
 
-        This prevents someone from checking which emails
-        have accounts on your website.
-      */
-
-      setMessage(
-        "If an account exists with this email, a password reset link has been sent. Please check your inbox."
-      );
-
-      setEmail("");
+      setDone(true);
     } catch (err) {
-      console.error("Forgot password error:", err);
+      console.error("Reset password error:", err);
 
       setError(
         err?.message ||
-        "Could not send the password reset link."
+        "Could not reset your password. Please try again."
       );
     } finally {
       setSubmitting(false);
     }
   };
+
+  // ---------------------------------------------------------
+  // RESEND OTP
+  // ---------------------------------------------------------
+  const handleResend = async () => {
+    if (cooldown > 0 || submitting) return;
+
+    setError("");
+    setMessage("");
+    setSubmitting(true);
+
+    try {
+      await forgotPassword(email);
+
+      setOtp("");
+      setCooldown(RESEND_COOLDOWN);
+      setMessage(`A new OTP has been sent to ${email}.`);
+    } catch (err) {
+      console.error("Resend OTP error:", err);
+
+      setError(
+        err?.message ||
+        "Could not resend the OTP. Please try again."
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // ---------------------------------------------------------
+  // SUCCESS
+  // ---------------------------------------------------------
+  if (done) {
+    return (
+      <div className="bg-white p-6 md:p-10 rounded-2xl border border-paper-line max-w-md mx-auto">
+        <p className="eyebrow text-gold mb-1">
+          All done
+        </p>
+
+        <h3 className="font-display text-2xl font-semibold text-ink mb-1">
+          Password updated
+        </h3>
+
+        <p className="text-sm text-slate-soft font-body mb-8">
+          Your password has been changed. You can now log in with your new password.
+        </p>
+
+        <button
+          type="button"
+          onClick={onBack}
+          className="
+            w-full py-3 rounded-full
+            text-sm font-semibold
+            bg-gold text-ink
+            hover:brightness-95
+            transition
+          "
+        >
+          Back to Login
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white p-6 md:p-10 rounded-2xl border border-paper-line max-w-md mx-auto">
@@ -84,12 +195,24 @@ const ForgotPasswordForm = ({
       </p>
 
       <h3 className="font-display text-2xl font-semibold text-ink mb-1">
-        Forgot password?
+        Reset your password
       </h3>
 
-      <p className="text-sm text-slate-soft font-body mb-8">
-        Enter your email and we'll send you a link to reset your password.
+      <p className="text-sm text-slate-soft font-body mb-1">
+        If an account exists for {email}, we've sent a 6-digit OTP to it.
+        It expires in 10 minutes.
       </p>
+
+      <button
+        type="button"
+        onClick={onChangeEmail}
+        className="
+          mb-8 text-xs font-semibold
+          text-teal hover:underline
+        "
+      >
+        Wrong email?
+      </button>
 
       {/* Error */}
 
@@ -101,7 +224,7 @@ const ForgotPasswordForm = ({
         </div>
       )}
 
-      {/* Success */}
+      {/* Info */}
 
       {message && (
         <div className="mb-4 rounded-xl bg-green-50 px-4 py-3">
@@ -117,18 +240,37 @@ const ForgotPasswordForm = ({
       >
 
         <input
-          type="email"
-          placeholder="Email address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          autoComplete="email"
-          className="
-            w-full border border-paper-line rounded-full
-            px-5 py-3 text-sm
-            focus:outline-none
-            focus:ring-2 focus:ring-gold/50
-            transition
-          "
+          type="text"
+          inputMode="numeric"
+          placeholder="Enter OTP"
+          value={otp}
+          onChange={(e) =>
+            setOtp(
+              e.target.value
+                .replace(/\D/g, "")
+                .slice(0, 6)
+            )
+          }
+          autoComplete="one-time-code"
+          className={`${inputClass} text-center tracking-[0.5em]`}
+        />
+
+        <input
+          type="password"
+          placeholder="New password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          autoComplete="new-password"
+          className={inputClass}
+        />
+
+        <input
+          type="password"
+          placeholder="Confirm new password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          autoComplete="new-password"
+          className={inputClass}
         />
 
         <button
@@ -144,8 +286,23 @@ const ForgotPasswordForm = ({
           "
         >
           {submitting
-            ? "Sending…"
-            : "Send Reset Link"}
+            ? "Please wait…"
+            : "Reset Password"}
+        </button>
+
+        <button
+          type="button"
+          onClick={handleResend}
+          disabled={cooldown > 0 || submitting}
+          className="
+            w-full text-xs font-semibold text-slate-soft
+            hover:text-ink
+            disabled:opacity-50 transition
+          "
+        >
+          {cooldown > 0
+            ? `Resend OTP in ${cooldown}s`
+            : "Resend OTP"}
         </button>
 
         <button
@@ -166,4 +323,4 @@ const ForgotPasswordForm = ({
   );
 };
 
-export default ForgotPasswordForm;
+export default ResetPasswordForm;

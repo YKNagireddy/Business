@@ -16,7 +16,6 @@ import BusinessMembers from "./components/BusinessMembers";
 import Testimonials from "./components/Testimonials";
 import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
-import ResetPassword from "./components/RestPassword";
 
 import { AuthProvider } from "./Context/AuthContext";
 
@@ -89,18 +88,6 @@ function AppContent() {
   useEffect(() => {
     fetchMembers();
   }, [fetchMembers]);
-
-  /*
-   * Password reset page
-   */
-
-  if (
-    window.location.pathname.startsWith(
-      "/reset-password/"
-    )
-  ) {
-    return <ResetPassword />;
-  }
 
   const companies = [
     {

@@ -1,14 +1,23 @@
 import React, { useState } from "react";
 import { forgotPassword } from "../Api/auth.js";
+import ResetPasswordForm from "./RestPassword";
+
+/*
+  Forgot password flow (2 steps, all inside this one screen):
+
+    Step 1  "email"  -> user enters email, backend emails a 6-digit OTP
+    Step 2  "reset"  -> <ResetPasswordForm /> : OTP + new password
+*/
 
 const ForgotPasswordForm = ({
   onBack,
   onCancel,
 }) => {
+  const [step, setStep] = useState("email"); // 'email' | 'reset'
+
   const [email, setEmail] = useState("");
 
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -16,7 +25,6 @@ const ForgotPasswordForm = ({
     e.preventDefault();
 
     setError("");
-    setMessage("");
 
     const cleanEmail = email.trim();
 
@@ -36,29 +44,36 @@ const ForgotPasswordForm = ({
       await forgotPassword(cleanEmail);
 
       /*
-        We intentionally show the same message whether
-        the email exists or not.
-
-        This prevents someone from checking which emails
-        have accounts on your website.
+        The backend answers the same whether or not this email
+        has an account, so we ALWAYS continue to the next step.
+        That way nobody can use this form to find out which
+        emails are registered.
       */
 
-      setMessage(
-        "If an account exists with this email, a password reset link has been sent. Please check your inbox."
-      );
-
-      setEmail("");
+      setEmail(cleanEmail);
+      setStep("reset");
     } catch (err) {
       console.error("Forgot password error:", err);
 
       setError(
         err?.message ||
-        "Could not send the password reset link."
+        "Could not send the OTP. Please try again."
       );
     } finally {
       setSubmitting(false);
     }
   };
+
+  if (step === "reset") {
+    return (
+      <ResetPasswordForm
+        email={email}
+        onBack={onBack}
+        onCancel={onCancel}
+        onChangeEmail={() => setStep("email")}
+      />
+    );
+  }
 
   return (
     <div className="bg-white p-6 md:p-10 rounded-2xl border border-paper-line max-w-md mx-auto">
@@ -88,7 +103,7 @@ const ForgotPasswordForm = ({
       </h3>
 
       <p className="text-sm text-slate-soft font-body mb-8">
-        Enter your email and we'll send you a link to reset your password.
+        Enter your email and we'll send you an OTP to reset your password.
       </p>
 
       {/* Error */}
@@ -97,16 +112,6 @@ const ForgotPasswordForm = ({
         <div className="mb-4 rounded-xl bg-red-50 px-4 py-3">
           <p className="text-sm text-red-600 font-body">
             {error}
-          </p>
-        </div>
-      )}
-
-      {/* Success */}
-
-      {message && (
-        <div className="mb-4 rounded-xl bg-green-50 px-4 py-3">
-          <p className="text-sm text-green-700 font-body">
-            {message}
           </p>
         </div>
       )}
@@ -144,8 +149,8 @@ const ForgotPasswordForm = ({
           "
         >
           {submitting
-            ? "Sending…"
-            : "Send Reset Link"}
+            ? "Sending OTP…"
+            : "Send OTP"}
         </button>
 
         <button

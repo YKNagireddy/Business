@@ -11,6 +11,8 @@ const SignupForm = ({ onVerified, onCancel }) => {
   const [mobile, setMobile] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [business, setBusiness] = useState("");
+  const [businessGST, setBusinessGST] =useState("");
 
   const [otp, setOtp] = useState("");
 
@@ -75,6 +77,8 @@ const SignupForm = ({ onVerified, onCancel }) => {
         mobile: mobile.trim(),
         email: email.trim(),
         password: password.trim(),
+        business: business,
+        businessGST: businessGST
       });
 
       console.log("Signup response:", response);
@@ -142,6 +146,8 @@ const SignupForm = ({ onVerified, onCancel }) => {
         mobile: mobile.trim(),
         email: email.trim(),
         password: password.trim(),
+        business: business,
+        businessGST: businessGST
       });
 
       console.log("Resend signup response:", response);
@@ -326,6 +332,30 @@ const SignupForm = ({ onVerified, onCancel }) => {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            className="
+              w-full border border-paper-line rounded-full
+              px-5 py-3 text-sm
+              focus:outline-none focus:ring-2 focus:ring-gold/50
+              transition
+            "
+          />
+          <input
+            type="text"
+            placeholder="Business Name"
+            value={business}
+            onChange={(e) => setBusiness(e.target.value)}
+            className="
+              w-full border border-paper-line rounded-full
+              px-5 py-3 text-sm
+              focus:outline-none focus:ring-2 focus:ring-gold/50
+              transition
+            "
+          />
+          <input
+            type="text"
+            placeholder="Business GST Number"
+            value={businessGST}
+            onChange={(e) => setBusinessGST(e.target.value)}
             className="
               w-full border border-paper-line rounded-full
               px-5 py-3 text-sm
