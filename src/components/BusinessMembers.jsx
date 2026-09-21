@@ -64,11 +64,11 @@ const BusinessMembers = ({
 
 const {
   user,
-  role,
-  isAdmin,
-  isMember,
-  hasRole,
-  isAuthenticated,
+  // role,
+  // isAdmin,
+  // isMember,
+  // hasRole,
+  // isAuthenticated,
   loading: authLoading,
   logout,       // context version — clears user state too
   checkAuth,

@@ -63,7 +63,9 @@ export const logout = async () => {
   });
 };
 
-// FORGOT PASSWORD
+// FORGOT PASSWORD - STEP 1
+// Sends a 6-digit OTP to the email. The backend answers the same
+// whether or not the email is registered.
 export const forgotPassword = async (email) => {
   return request("/api/forgot-password", {
     method: "POST",
@@ -73,12 +75,15 @@ export const forgotPassword = async (email) => {
   });
 };
 
-// RESET PASSWORD
-export const resetPassword = async (token, password) => {
-  return request(`/api/reset-password/${token}`, {
+// RESET PASSWORD - STEP 2
+// Verifies the OTP and saves the new password.
+export const resetPassword = async ({ email, otp, newPassword }) => {
+  return request("/api/reset-password", {
     method: "POST",
     body: JSON.stringify({
-      password,
+      email,
+      otp,
+      newPassword,
     }),
   });
 };
