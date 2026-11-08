@@ -113,12 +113,10 @@ function AppContent() {
       />
 
       <AboutFounder />
-
-      <Achievements />
-
       <Companies
         companies={companies}
       />
+      <Achievements />
 
       <Statistics />
 
