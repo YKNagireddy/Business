@@ -1,3 +1,4 @@
+
 import React, {
   useMemo,
   useState,
@@ -5,17 +6,50 @@ import React, {
   useRef,
 } from "react";
 
-import OtherBusinessImage from "../OtherBusinessImage";
 import BusinessDetails from "../BusinessDetails";
 import ContactAdminCard from "./ContactAdminCard";
 import SignupForm from "./SignupForm";
 import PaymentPage from "./PaymentPage";
 import LoginForm from "./LoginForm";
 import ForgotPasswordForm from "./ForgotPasswordForm";
-// import ResetPassword from "./RestPassword";
+
 import { useAuth } from "../Context/AuthContext";
 
+import Agri from "../Assets/Agriculture.jpg";
+import Conve from "../Assets/Convearyes.jpg";
+import Engneer from "../Assets/Engneer.jpg";
+import Architect from "../Assets/Architect.jpg";
+import Apprales from "../Assets/Apparles.jpg";
+
 const ITEMS_PER_PAGE = 10;
+
+// -----------------------------------------------------------------------------
+// Category images
+// -----------------------------------------------------------------------------
+
+const CATEGORY_IMAGES = {
+  Agriculture: Agri,
+  "Conveyor Systems": Conve,
+  Engineering: Engneer,
+  Architecture: Architect,
+  Apparel: Apprales,
+};
+
+// -----------------------------------------------------------------------------
+// Get matching category image
+// -----------------------------------------------------------------------------
+
+const getCategoryImage = (categoryName) => {
+  const matchedKey = Object.keys(CATEGORY_IMAGES).find(
+    (name) =>
+      name.toLowerCase().trim() ===
+      (categoryName || "").toLowerCase().trim()
+  );
+
+  return matchedKey
+    ? CATEGORY_IMAGES[matchedKey]
+    : null;
+};
 
 // -----------------------------------------------------------------------------
 // Page range helper
@@ -59,31 +93,20 @@ const getPageRange = (current, total) => {
 // -----------------------------------------------------------------------------
 
 const BusinessMembers = ({
-  otherBusinessItems,
+  otherBusinessItems = [],
 }) => {
 
-const {
-  user,
-  // role,
-  // isAdmin,
-  // isMember,
-  // hasRole,
-  // isAuthenticated,
-  loading: authLoading,
-  logout,       // context version — clears user state too
-  checkAuth,
-} = useAuth();
+  const {
+    user,
+    loading: authLoading,
+    logout,
+    checkAuth,
+  } = useAuth();
 
-  const [searchTerm, setSearchTerm] =
-    useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const [currentPage, setCurrentPage] =
-    useState(1);
-
-  // ---------------------------------------------------------------------------
   // Browse state
-  // ---------------------------------------------------------------------------
-
   const [selectedCategory, setSelectedCategory] =
     useState(null);
 
@@ -92,7 +115,10 @@ const {
 
   const [paymentDone, setPaymentDone] =
     useState(false);
-  const [authView, setAuthView] = useState("login");
+
+  const [authView, setAuthView] =
+    useState("login");
+
   const [userMenuOpen, setUserMenuOpen] =
     useState(false);
 
@@ -106,8 +132,7 @@ const {
     otherBusinessItems.forEach((item) => {
       item.companies?.forEach((company) => {
         const name =
-          company.category?.trim() ||
-          "Other";
+          company.category?.trim() || "Other";
 
         if (!map.has(name)) {
           map.set(name, {
@@ -139,6 +164,7 @@ const {
       .sort((a, b) =>
         a.name.localeCompare(b.name)
       );
+
   }, [otherBusinessItems]);
 
   // ---------------------------------------------------------------------------
@@ -150,8 +176,7 @@ const {
       return categories;
     }
 
-    const lower =
-      searchTerm.toLowerCase();
+    const lower = searchTerm.toLowerCase();
 
     return categories
       .map((category) => {
@@ -174,12 +199,12 @@ const {
         return matchingKeywords.length > 0
           ? {
               ...category,
-              keywords:
-                matchingKeywords,
+              keywords: matchingKeywords,
             }
           : null;
       })
       .filter(Boolean);
+
   }, [categories, searchTerm]);
 
   // ---------------------------------------------------------------------------
@@ -202,21 +227,15 @@ const {
     if (currentPage > totalPages) {
       setCurrentPage(totalPages);
     }
-  }, [
-    currentPage,
-    totalPages,
-  ]);
+  }, [currentPage, totalPages]);
 
   const paginatedCategories =
     filteredCategories.slice(
-      (currentPage - 1) *
-        ITEMS_PER_PAGE,
-      currentPage *
-        ITEMS_PER_PAGE
+      (currentPage - 1) * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE
     );
 
-  const gridTopRef =
-    useRef(null);
+  const gridTopRef = useRef(null);
 
   const scrollToGridTop = () => {
     gridTopRef.current?.scrollIntoView({
@@ -242,22 +261,17 @@ const {
   // Browse handlers
   // ---------------------------------------------------------------------------
 
-  const handleSelectCategory = (
-    category
-  ) => {
+  const handleSelectCategory = (category) => {
     const full =
       categories.find(
-        (item) =>
-          item.name === category.name
+        (item) => item.name === category.name
       ) || category;
 
     setSelectedCategory(full);
     setSelectedKeyword(null);
   };
 
-  const handleSelectKeyword = (
-    keyword
-  ) => {
+  const handleSelectKeyword = (keyword) => {
     setSelectedKeyword(keyword);
     setPaymentDone(false);
   };
@@ -277,47 +291,40 @@ const {
   // ---------------------------------------------------------------------------
   // Login
   // ---------------------------------------------------------------------------
-const handleLoggedIn = async () => {
-  await checkAuth();
-  setAuthView("login");
-  setUserMenuOpen(false);
-};
+
+  const handleLoggedIn = async () => {
+    await checkAuth();
+    setAuthView("login");
+    setUserMenuOpen(false);
+  };
 
   // ---------------------------------------------------------------------------
   // Signup verification
-  //
-  // For frontend stage we receive the user data from SignupForm.
-  // Backend authentication/session will be connected later.
   // ---------------------------------------------------------------------------
 
   const handleVerified = async () => {
-  await checkAuth();
-  setAuthView("login");
-  setUserMenuOpen(false);
-};
+    await checkAuth();
+    setAuthView("login");
+    setUserMenuOpen(false);
+  };
 
   // ---------------------------------------------------------------------------
   // Logout
   // ---------------------------------------------------------------------------
 
   const handleLogout = async () => {
-  try {
-    await logout();
-  } catch (error) {
-    console.error(
-      "Logout error:",
-      error
-    );
-  } finally {
-    setUserMenuOpen(false);
-
-    setSelectedCategory(null);
-    setSelectedKeyword(null);
-    setPaymentDone(false);
-
-    setAuthView("login");
-  }
-};
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setUserMenuOpen(false);
+      setSelectedCategory(null);
+      setSelectedKeyword(null);
+      setPaymentDone(false);
+      setAuthView("login");
+    }
+  };
 
   // ---------------------------------------------------------------------------
   // Payment
@@ -350,7 +357,6 @@ const handleLoggedIn = async () => {
         className="bg-paper py-24 px-6"
       >
         <div className="max-w-7xl mx-auto">
-
           <div className="flex justify-center mb-10">
             <svg
               width="160"
@@ -395,7 +401,6 @@ const handleLoggedIn = async () => {
               Checking login…
             </p>
           </div>
-
         </div>
       </section>
     );
@@ -412,21 +417,16 @@ const handleLoggedIn = async () => {
     >
       <div className="max-w-7xl mx-auto">
 
-        {/* ------------------------------------------------------------------ */}
-        {/* Logged-in user - TOP RIGHT                                         */}
-        {/* ------------------------------------------------------------------ */}
+        {/* Logged-in user */}
 
         {user && (
           <div className="flex justify-end mb-6 relative">
-
             <div className="relative">
 
               <button
                 type="button"
                 onClick={() =>
-                  setUserMenuOpen(
-                    (open) => !open
-                  )
+                  setUserMenuOpen((open) => !open)
                 }
                 className="
                   flex items-center gap-3
@@ -439,8 +439,6 @@ const handleLoggedIn = async () => {
                   transition
                 "
               >
-
-                {/* Avatar */}
 
                 <div
                   className="
@@ -456,19 +454,14 @@ const handleLoggedIn = async () => {
                     ?.toUpperCase() || "U"}
                 </div>
 
-                {/* Name / email */}
-
                 <div className="text-left hidden sm:block">
-
                   <p className="text-xs font-semibold text-ink">
-                    {user.name ||
-                      "User"}
+                    {user.name || "User"}
                   </p>
 
                   <p className="text-[11px] text-slate-soft">
                     {user.email}
                   </p>
-
                 </div>
 
                 <span className="text-xs text-slate-soft">
@@ -476,8 +469,6 @@ const handleLoggedIn = async () => {
                 </span>
 
               </button>
-
-              {/* Dropdown */}
 
               {userMenuOpen && (
                 <div
@@ -494,16 +485,13 @@ const handleLoggedIn = async () => {
                 >
 
                   <div className="px-3 py-2 border-b border-paper-line">
-
                     <p className="text-xs font-semibold text-ink">
-                      {user.name ||
-                        "User"}
+                      {user.name || "User"}
                     </p>
 
                     <p className="text-[11px] text-slate-soft break-all">
                       {user.email}
                     </p>
-
                   </div>
 
                   <button
@@ -530,12 +518,9 @@ const handleLoggedIn = async () => {
           </div>
         )}
 
-        {/* ------------------------------------------------------------------ */}
-        {/* Section decoration                                                 */}
-        {/* ------------------------------------------------------------------ */}
+        {/* Section decoration */}
 
         <div className="flex justify-center mb-10">
-
           <svg
             width="160"
             height="28"
@@ -572,12 +557,9 @@ const handleLoggedIn = async () => {
               fill="#1F5C57"
             />
           </svg>
-
         </div>
 
-        {/* ------------------------------------------------------------------ */}
-        {/* Header                                                              */}
-        {/* ------------------------------------------------------------------ */}
+        {/* Header */}
 
         <div
           ref={gridTopRef}
@@ -587,52 +569,49 @@ const handleLoggedIn = async () => {
             scroll-mt-24
           "
         >
-
           <p className="eyebrow text-teal mb-3">
             BNI Referral Network
           </p>
 
-          <h2 className="
-            font-display
-            font-semibold
-            text-3xl md:text-4xl
-            text-ink
-            mb-4
-          ">
+          <h2
+            className="
+              font-display
+              font-semibold
+              text-3xl md:text-4xl
+              text-ink
+              mb-4
+            "
+          >
             Business Members
           </h2>
 
-          <p className="
-            text-slate-soft
-            font-body
-            max-w-xl
-            mx-auto
-            text-sm md:text-base
-          ">
+          <p
+            className="
+              text-slate-soft
+              font-body
+              max-w-xl
+              mx-auto
+              text-sm md:text-base
+            "
+          >
             Browse by category, then by
             service — reach out to the
             chapter admin to get connected
             with the right member.
           </p>
-
         </div>
 
-        {/* ------------------------------------------------------------------ */}
-        {/* Search                                                              */}
-        {/* ------------------------------------------------------------------ */}
+        {/* Search */}
 
         {!selectedCategory && (
           <>
             <div className="mb-3 flex justify-center">
-
               <input
                 type="text"
                 placeholder="Search by category or service..."
                 value={searchTerm}
                 onChange={(e) =>
-                  setSearchTerm(
-                    e.target.value
-                  )
+                  setSearchTerm(e.target.value)
                 }
                 className="
                   border
@@ -648,16 +627,17 @@ const handleLoggedIn = async () => {
                   transition
                 "
               />
-
             </div>
 
-            <p className="
-              text-center
-              text-xs
-              text-slate-soft
-              font-mono
-              mb-8
-            ">
+            <p
+              className="
+                text-center
+                text-xs
+                text-slate-soft
+                font-mono
+                mb-8
+              "
+            >
               {filteredCategories.length}{" "}
               categor
               {filteredCategories.length !== 1
@@ -670,127 +650,186 @@ const handleLoggedIn = async () => {
           </>
         )}
 
-        {/* ------------------------------------------------------------------ */}
-        {/* Main content                                                        */}
-        {/* ------------------------------------------------------------------ */}
+        {/* Main content */}
 
         <div className="min-h-[50vh]">
 
-          {/* -------------------------------------------------------------- */}
-          {/* Not logged in + category selected                               */}
-          {/* -------------------------------------------------------------- */}
+          {/* Not logged in + category selected */}
 
-          {selectedCategory &&
-          !user ? (
+          {selectedCategory && !user ? (
             <>
               {authView === "login" && (
                 <LoginForm
-                  onLoggedIn={
-                    handleLoggedIn
-                  }
-                  onSignup={() =>
-                    setAuthView(
-                      "signup"
-                    )
-                  }
+                  onLoggedIn={handleLoggedIn}
+                  onSignup={() => setAuthView("signup")}
                   onForgotPassword={() =>
-                    setAuthView(
-                      "forgot"
-                    )
+                    setAuthView("forgot")
                   }
-                  onCancel={
-                    handleBackToCategories
-                  }
+                  onCancel={handleBackToCategories}
                 />
               )}
 
               {authView === "signup" && (
                 <SignupForm
-                  onVerified={
-                    handleVerified
-                  }
-                  onCancel={() =>
-                    setAuthView(
-                      "login"
-                    )
-                  }
+                  onVerified={handleVerified}
+                  onCancel={() => setAuthView("login")}
                 />
               )}
 
               {authView === "forgot" && (
                 <ForgotPasswordForm
-                  onBack={() =>
-                    setAuthView(
-                      "login"
-                    )
-                  }
-                  onCancel={
-                    handleBackToCategories
-                  }
+                  onBack={() => setAuthView("login")}
+                  onCancel={handleBackToCategories}
                 />
               )}
             </>
-          ) : selectedKeyword &&
-            paymentDone ? (
+          ) : selectedKeyword && paymentDone ? (
 
             <ContactAdminCard
-              keyword={
-                selectedKeyword
-              }
-              category={
-                selectedCategory
-              }
-              onBackToKeywords={
-                handleBackToKeywords
-              }
-              onBackToCategories={
-                handleBackToCategories
-              }
-              onGoToContact={
-                handleGoToContact
-              }
+              keyword={selectedKeyword}
+              category={selectedCategory}
+              onBackToKeywords={handleBackToKeywords}
+              onBackToCategories={handleBackToCategories}
+              onGoToContact={handleGoToContact}
             />
 
           ) : selectedKeyword ? (
 
             <PaymentPage
-              keyword={
-                selectedKeyword
-              }
-              category={
-                selectedCategory
-              }
+              keyword={selectedKeyword}
+              category={selectedCategory}
               onPaid={handlePaid}
-              onBack={
-                handleBackToKeywords
-              }
+              onBack={handleBackToKeywords}
             />
 
           ) : selectedCategory ? (
 
             <BusinessDetails
-              category={
-                selectedCategory
-              }
-              onSelectKeyword={
-                handleSelectKeyword
-              }
-              onBack={
-                handleBackToCategories
-              }
+              category={selectedCategory}
+              onSelectKeyword={handleSelectKeyword}
+              onBack={handleBackToCategories}
             />
 
           ) : (
 
             <>
-              <OtherBusinessImage
-                categories={
-                  paginatedCategories
-                }
-                onSelectCategory={
-                  handleSelectCategory
-                }
-              />
+              {/* Category cards with matching images */}
+
+              <div className="
+                grid
+                grid-cols-1
+                sm:grid-cols-3
+                lg:grid-cols-4
+                xl:grid-cols-5
+                gap-6
+              ">
+                {paginatedCategories.map((category) => {
+                  const image = getCategoryImage(
+                    category.name
+                  );
+
+                  return (
+                    <button
+                      key={category.name}
+                      type="button"
+                      onClick={() =>
+                        handleSelectCategory(category)
+                      }
+                      className="
+                        group
+                        text-left
+                        bg-white
+                        rounded-2xl
+                        overflow-hidden
+                        border border-paper-line
+                        shadow-sm
+                        hover:shadow-lg
+                        hover:border-gold
+                        transition-all
+                        duration-300
+                      "
+                    >
+                      {image && (
+                        <div className="
+                          w-full
+                          h-48
+                          overflow-hidden
+                          bg-gray-100
+                        ">
+                          <img
+                            src={image}
+                            alt={category.name}
+                            className="
+                              w-full
+                              h-full
+                              object-cover
+                              group-hover:scale-105
+                              transition-transform
+                              duration-500
+                            "
+                          />
+                        </div>
+                      )}
+
+                      <div className="p-5">
+
+                        <h3 className="
+                          text-lg
+                          font-semibold
+                          text-ink
+                          group-hover:text-teal
+                          transition
+                        ">
+                          {category.name}
+                        </h3>
+
+                        <p className="
+                          text-sm
+                          text-slate-soft
+                          mt-2
+                        ">
+                          {category.count}{" "}
+                          {category.count === 1
+                            ? "member"
+                            : "members"}
+                        </p>
+
+                        {category.keywords.length > 0 && (
+                          <p className="
+                            text-xs
+                            text-slate-soft
+                            mt-3
+                            line-clamp-2
+                          ">
+                            {category.keywords.join(", ")}
+                          </p>
+                        )}
+
+                        <span className="
+                          inline-block
+                          text-xs
+                          font-semibold
+                          text-teal
+                          mt-4
+                        ">
+                          Explore →
+                        </span>
+
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* No categories found */}
+
+              {paginatedCategories.length === 0 && (
+                <div className="text-center py-16">
+                  <p className="text-slate-soft text-sm">
+                    No matching business categories found.
+                  </p>
+                </div>
+              )}
 
               {/* Pagination */}
 
@@ -806,13 +845,9 @@ const handleLoggedIn = async () => {
 
                   <button
                     onClick={() =>
-                      goToPage(
-                        currentPage - 1
-                      )
+                      goToPage(currentPage - 1)
                     }
-                    disabled={
-                      currentPage === 1
-                    }
+                    disabled={currentPage === 1}
                     className="
                       px-3 py-2
                       rounded-full
@@ -848,9 +883,7 @@ const handleLoggedIn = async () => {
                     ) : (
                       <button
                         key={page}
-                        onClick={() =>
-                          goToPage(page)
-                        }
+                        onClick={() => goToPage(page)}
                         className={`
                           w-9 h-9
                           rounded-full
@@ -859,8 +892,7 @@ const handleLoggedIn = async () => {
                           font-semibold
                           transition
                           ${
-                            page ===
-                            currentPage
+                            page === currentPage
                               ? "bg-gold text-ink"
                               : "bg-white border border-paper-line text-slate hover:border-gold"
                           }
@@ -873,13 +905,10 @@ const handleLoggedIn = async () => {
 
                   <button
                     onClick={() =>
-                      goToPage(
-                        currentPage + 1
-                      )
+                      goToPage(currentPage + 1)
                     }
                     disabled={
-                      currentPage ===
-                      totalPages
+                      currentPage === totalPages
                     }
                     className="
                       px-3 py-2
@@ -900,7 +929,6 @@ const handleLoggedIn = async () => {
 
                 </div>
               )}
-
             </>
           )}
 
