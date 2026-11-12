@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 const NODES = [
   { x: 60, y: 80 }, { x: 220, y: 40 }, { x: 380, y: 120 }, { x: 520, y: 60 },
@@ -9,7 +9,21 @@ const EDGES = [
   [0, 1], [1, 2], [2, 3], [3, 4], [1, 5], [2, 6], [4, 7], [5, 8], [6, 9], [3, 6],
 ];
 
-const HeroBanner = ({ portraitSrc }) => {
+const SLIDE_INTERVAL = 5000; // 5 seconds per image
+
+const HeroBanner = ({ portraits = [] }) => {
+  const [current, setCurrent] = useState(0);
+
+  // Auto-advance every 5 seconds. Including `current` restarts the timer
+  // when a visitor clicks a dot, so the chosen image gets a full 5 seconds.
+  useEffect(() => {
+    if (portraits.length < 2) return;
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % portraits.length);
+    }, SLIDE_INTERVAL);
+    return () => clearInterval(timer);
+  }, [portraits.length, current]);
+
   return (
     <section
       id="home"
@@ -77,22 +91,46 @@ const HeroBanner = ({ portraitSrc }) => {
           </div>
         </div>
 
+        {/* Portrait slideshow */}
         <div className="flex justify-center md:justify-end">
-          <div className="relative">
+          <div className="relative w-full max-w-sm">
             <div className="absolute -inset-4 rounded-[2rem] border border-gold/30" />
-            <img
-              src={portraitSrc}
-              alt="Santhosh Maryala"
-              className="relative w-full max-w-sm rounded-[1.75rem] shadow-2xl object-cover"
-            />
+
+            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[1.75rem] shadow-2xl">
+              {portraits.map((src, i) => (
+                <img
+                  key={i}
+                  src={src}
+                  alt="Santhosh Maryala"
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 motion-reduce:transition-none ${
+                    i === current ? 'opacity-100' : 'opacity-0'
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* {portraits.length > 1 && (
+              <div className="flex justify-center gap-2 mt-4">
+                {portraits.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrent(i)}
+                    aria-label={`Show photo ${i + 1}`}
+                    className={`h-2 rounded-full transition-all ${
+                      i === current ? 'w-6 bg-gold' : 'w-2 bg-white/30'
+                    }`}
+                  />
+                ))}
+              </div>
+            )} */}
           </div>
         </div>
       </div>
 
       {/* scroll cue */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/40 text-xs eyebrow">
+      {/* <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/40 text-xs eyebrow">
         Scroll
-      </div>
+      </div> */}
     </section>
   );
 };
