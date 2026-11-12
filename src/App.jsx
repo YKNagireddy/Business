@@ -21,9 +21,14 @@ import { AuthProvider } from "./Context/AuthContext";
 
 import MetroLabs from "./Assets/Metrolabs.png";
 import Bhokta from "./Assets/bhokta.png";
-import Santhosh1 from "./Assets/santhosh1.jpeg";
+import Santhosh1 from "./Assets/santhosh.JPG";
+import Santhosh2 from "./Assets/santhoshm.JPG";
+import Santhosh3 from "./Assets/santhosh1.jpeg";
 
 import { getAllPersons } from "./Api/index.js";
+
+// Hero slideshow images (each shown for 5 seconds)
+const heroPortraits = [Santhosh1, Santhosh2, Santhosh3];
 
 const flattenPersons = (persons) =>
   persons.map((person) => ({
@@ -109,7 +114,7 @@ function AppContent() {
       <Navbar />
 
       <HeroBanner
-        portraitSrc={Santhosh1}
+        portraits={heroPortraits}
       />
 
       <AboutFounder />

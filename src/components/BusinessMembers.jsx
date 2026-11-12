@@ -752,7 +752,6 @@ const BusinessMembers = ({
                       {image && (
                         <div className="
                           w-full
-                          h-48
                           overflow-hidden
                           bg-gray-100
                         ">
@@ -762,8 +761,8 @@ const BusinessMembers = ({
                             className="
                               w-full
                               h-full
-                              object-cover
-                              group-hover:scale-105
+                              // object-cover
+                              // group-hover:scale-105
                               transition-transform
                               duration-500
                             "
@@ -771,9 +770,9 @@ const BusinessMembers = ({
                         </div>
                       )}
 
-                      <div className="p-5">
+                      <div className={`${!image} ? : p-5`}>
 
-                        <h3 className="
+                        {!image && (<h3 className="
                           text-lg
                           font-semibold
                           text-ink
@@ -781,7 +780,7 @@ const BusinessMembers = ({
                           transition
                         ">
                           {category.name}
-                        </h3>
+                        </h3>) }
 
                         <p className="
                           text-sm
