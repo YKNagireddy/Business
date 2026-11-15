@@ -570,7 +570,7 @@ const BusinessMembers = ({
           "
         >
           <p className="eyebrow text-teal mb-3">
-            BNI Referral Network
+            My Referral Network
           </p>
 
           <h2
