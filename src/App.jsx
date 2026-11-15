@@ -21,6 +21,11 @@ import { AuthProvider } from "./Context/AuthContext";
 
 import MetroLabs from "./Assets/Metrolabs.png";
 import Bhokta from "./Assets/bhokta.png";
+import Halini from "./Assets/HaliniNexes.png"
+import ABC from "./Assets/ABCReality.png"
+import Ocian from "./Assets/ocian oversis.jpg"
+import SRN from "./Assets/SRN paper products.png"
+import Flexi from "./Assets/flexi fee.jpg"
 import Santhosh1 from "./Assets/santhosh.JPG";
 import Santhosh2 from "./Assets/santhoshm.JPG";
 import Santhosh3 from "./Assets/santhosh1.jpeg";
@@ -28,7 +33,7 @@ import Santhosh3 from "./Assets/santhosh1.jpeg";
 import { getAllPersons } from "./Api/index.js";
 
 // Hero slideshow images (each shown for 5 seconds)
-const heroPortraits = [Santhosh1, Santhosh2, Santhosh3];
+const heroPortraits = [Santhosh1, Santhosh3, Santhosh2];
 
 const flattenPersons = (persons) =>
   persons.map((person) => ({
@@ -99,7 +104,37 @@ function AppContent() {
       name: "MetroLabs",
       logo: MetroLabs,
       tagline:
-        "IT services & software solutions",
+        "HR services & IT + software solutions",
+    },
+    {
+      name: "Halini",
+      logo: Halini,
+      tagline:
+        "Human IIntelligence. Software Excellence",
+    },
+    {
+      name: "ABC ",
+      logo: ABC,
+      tagline:
+        "A Real estate venture",
+    },
+    {
+      name: "Ocian oversisi educational consultancy",
+      logo: Ocian,
+      tagline:
+        "Educational consultancy",
+    },
+    {
+      name: "SRN paper products",
+      logo: SRN,
+      tagline:
+        " Manufacturers of Corrugated Products",
+    },
+    {
+      name: "Flexifee",
+      logo: Flexi,
+      tagline:
+        "School fee financing",
     },
     {
       name: "Bhokta",
