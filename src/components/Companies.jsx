@@ -71,7 +71,7 @@ const Companies = ({ companies = [] }) => {
   {visibleCompanies.map((c, i) => (
     <div
       key={`${c.name}-${current}-${i}`}
-      className="relative min-w-0 h-48 border border-paper-line rounded-2xl p-6 flex flex-col items-center justify-center text-center bg-paper hover:shadow-xl transition-all duration-500 overflow-hidden"
+      className="relative min-w-0 h-48 rounded-2xl p-6 flex flex-col items-center justify-center text-center hover:shadow-xl transition-all duration-500 overflow-hidden"
     >
       <div className="h-16 w-full mb-5 flex items-center justify-center shrink-0">
         <img
@@ -85,7 +85,7 @@ const Companies = ({ companies = [] }) => {
         {c.tagline}
       </p>
 
-      <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-gold" />
+      {/* <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-gold" /> */}
     </div>
   ))}
 </div>
